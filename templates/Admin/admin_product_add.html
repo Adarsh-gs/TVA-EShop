@@ -1,0 +1,122 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Product</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .form-container h2 {
+            text-align: center;
+        }
+        .form-container form {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+        }
+        .form-container input, .form-container select, .form-container textarea {
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-container textarea {
+            resize: vertical;
+            height: 100px;
+        }
+        .form-container button {
+            grid-column: span 2;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+        .form-container button:hover {
+            background-color: darkgreen;
+        }
+        .form-container input[type="file"] {
+            padding: 5px;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <h1>Add New Product</h1>
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="form-container">
+            <form action="{% url 'add_product' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="product_name">Product Name</label>
+                <input type="text" name="product_name" id="product_name" required>
+                
+                <label for="category">Category</label>
+                <select name="category" id="category" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}">{{ category.name }}</option>
+                    {% endfor %}
+                </select>
+                
+                <label for="description">Description</label>
+                <textarea name="description" id="description" required></textarea>
+
+                <label for="specification">specification</label>
+                <textarea name="specification" id="specification" required></textarea>
+                
+                <label for="product_price">Product Price</label>
+                <input type="number" name="product_price" id="product_price" required>
+                
+                <label for="sale_price">Sale Price</label>
+                <input type="number" name="sale_price" id="sale_price" required>
+
+                <label for="sizes">Sizes</label>
+                <input type="text" name="sizes" id="sizes" placeholder="Enter sizes separated by commas" required>
+
+                <label for="colors">Colors</label>
+                <input type="text" name="colors" id="colors" placeholder="Enter colors separated by commas" required>
+
+                <label for="quantity">Quantity</label>
+                <input type="number" name="quantity" id="quantity" required>
+                
+                <label for="main_image">Main Image</label> 
+                <input type="file" name="main_image" id="main_image" accept="image/*" required>
+                
+                <label for="product_images">Product Images (minimum 3)</label>
+                <input type="file" name="product_images" id="product_images" accept="image/*" multiple required>
+                
+                <button type="submit">Add Product</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

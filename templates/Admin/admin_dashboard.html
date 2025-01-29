@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .nav-link.active {
+            background-color: black;
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Dashboard</h1>
+        </div>
+
+        <div class="content">
+            <!-- Graph Section -->
+            <div class="graph-container">
+                <h2>Sales Graph</h2>
+                <div id="graph" style="height: 300px;">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+
+
+            <div class="recent-sales">
+                <h2>Recent Sales</h2>
+                <ul>
+                    <li>Sale 1 - $500</li>
+                    <li>Sale 2 - $300</li>
+                    <li>Sale 3 - $150</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="count-boxes">
+            <div class="count-box">
+                <h3>Total Sales</h3>
+                <p>$10,000</p> <!-- Dynamic Value -->
+            </div>
+            <div class="count-box">
+                <h3>Visitors</h3>
+                <p>500</p> <!-- Dynamic Value -->
+            </div>
+            <div class="count-box">
+                <h3>Total Orders</h3>
+                <p>200</p> <!-- Dynamic Value -->
+            </div>
+            <div class="count-box">
+                <h3>Users</h3>
+                <p>150</p> <!-- Dynamic Value -->
+            </div>
+        </div>
+        <div class="summary-metrics">
+            <p>Total Sales: ${{ total_sales }}</p>
+            <p>Total Discount: ${{ total_discount }}</p>
+            <p>Total Orders: {{ total_orders }}</p>
+        </div>
+        
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May'],
+                datasets: [{
+                    label: 'Sales Over Time',
+                    data: [500, 1000, 1500, 2000, 2500],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        document.getElementById('filter-btn').addEventListener('click', () => {
+        const period = document.getElementById('period-filter').value;
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+
+        let query = `?period=${period}`;
+        if (startDate && endDate) {
+            query += `&start_date=${startDate}&end_date=${endDate}`;
+        }
+
+        window.location.href = `/sales-report/${query}`;
+    });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Product Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f9;
+        }
+        .product-detail-container {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            margin-top: 20px;
+        }
+        .product-detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        .product-main-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .additional-images img {
+            max-width: 80px;
+            max-height: 80px;
+            margin: 5px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            transition: transform 0.2s;
+        }
+        .additional-images img:hover {
+            transform: scale(1.1);
+        }
+        .back-btn {
+            text-decoration: none;
+            background-color: #FF6F61;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+        .back-btn:hover {
+            background-color: #ff5444;
+        }
+        .product-info {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .product-info p strong {
+            font-weight: 600;
+        }
+        .product-info p i {
+            margin-right: 8px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="product-detail-container">
+            <div class="product-detail-header">
+                <h2>Product Details</h2>
+                <a href="/admin/products" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Products</a>
+            </div>
+            <div class="row">
+                <div class="col-md-6 product-info">
+                    <p><i class="fas fa-tag"></i> <strong>Product Name:</strong> {{ product.product_name }}</p>
+                    <p><i class="fas fa-layer-group"></i> <strong>Category:</strong> {{ product.category.name }}</p>
+                    <p><i class="fas fa-dollar-sign"></i> <strong>Sale Price:</strong> ${{ product.sale_price }}</p>
+                    <p><i class="fas fa-box"></i> <strong>Quantity:</strong> {{ product.quantity }}</p>
+                    <p><i class="fas fa-tshirt"></i> <strong>Sizes:</strong> {{ product.sizes }}</p>
+                    <p><i class="fas fa-palette"></i> <strong>Colours:</strong> {{ product.colors }}</p>
+                    <p><i class="fas fa-align-left"></i> <strong>Description:</strong> {{ product.description }}</p>
+                    <p><i class="fas fa-cogs"></i> <strong>Specification:</strong> {{ product.specification }}</p>
+                    <h3 class="mt-4">Additional Images</h3>
+                    <div class="additional-images d-flex flex-wrap">
+                        {% for image in product.product_images.all %}
+                            <img src="{{ image.image.url }}" alt="Additional image for {{ product.product_name }}">
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="col-md-6 text-center">
+                    <img src="{{ product.main_image.url }}" alt="Main image for {{ product.product_name }}" class="product-main-image">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

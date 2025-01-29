@@ -1,0 +1,252 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>TVA E-Shop</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="TVA E-Shop, online shopping, electronics, fashion, deals" name="keywords">
+        <meta content="Shop the latest electronics, fashion, and more at TVA E-Shop. Discover exclusive deals and fast delivery!" name="description">
+
+        <!-- Favicon -->
+        <link href="{% static ''%}img/favicon.ico" rel="icon">
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
+
+        <!-- CSS Libraries -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+        <link href="{% static 'lib/slick/slick.css'%}" rel="stylesheet">
+        <link href="{% static 'lib/slick/slick-theme.css'%}" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="{% static 'css/style.css'%}" rel="stylesheet">
+        <style>
+            .btn-modern {
+                background-color: #007bff;
+                color: white;
+                font-weight: bold;
+                border: none;
+                border-radius: 0.5rem;
+                display: inline-flex;
+                align-items: center;
+                transition: transform 0.3s, background-color 0.3s;
+            }
+            .btn-modern i {
+                font-size: 1.2rem;
+            }
+            .btn-modern:hover {
+                background-color: #0056b3;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+    </head>
+
+    <body>
+        {% include 'inc/topbar.html'%} 
+        <!-- Nav Bar Start -->
+        <div class="nav">
+            <div class="container-fluid">
+                <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+                    <a href="#" class="navbar-brand">MENU</a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto">
+                            <a href="{% url 'Home_page'%}" class="nav-item nav-link">Home</a>
+                            <a href="{% url 'Product_list'%}" class="nav-item nav-link">Products</a>
+                            <a href="{% url 'cart'%}" class="nav-item nav-link active">Cart</a>
+                            <a href="{% url 'Checkout'%}" class="nav-item nav-link">Checkout</a>
+                            <a href="{% url 'My_account'%}" class="nav-item nav-link">My Account</a>
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
+                                <div class="dropdown-menu">
+                                    <a href="{% url 'Wishlist'%}" class="dropdown-item">Wishlist</a>
+                                    <a href="{% url 'contact' %}" class="dropdown-item">Contact Us</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="navbar-nav ml-auto">
+                            <div class="nav-item dropdown">
+                                <a href="{% url 'logout_view' %}" class="nav-link">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!-- Nav Bar End -->   
+        {% include 'inc/bottombar.html'%} 
+        
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'Home_page'%}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'Product_list'%}">Products</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'Product_list'%}">Product Detail</a></li>
+                    <li class="breadcrumb-item active">Cart</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+        
+        <!-- Cart Start -->
+        <div class="cart-page">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-lg-8">
+                        {% if messages %}
+                            <div class="messages">
+                                {% for message in messages %}
+                                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="cart-page-inner">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Size</th>
+                                            <th>Colour</th>
+                                            <th>Price</th>
+                                            <th>Quantity</th>
+                                            <th>Total</th>
+                                            <th>Remove</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="align-middle">
+                                        {% for item in cart_items %}
+                                        <tr>
+                                            <td>
+                                                <div class="img">
+                                                    <a href="#"><img src="{{ item.product.main_image.url }}" alt="Image"></a>
+                                                    <p>{{ item.product.product_name }}</p>
+                                                </div>
+                                            </td>
+                                            <td>{{ item.selected_size }}</td>
+                                            <td>{{ item.selected_color }}</td>
+                                            <td>${{ item.product.sale_price }}</td>
+                                            <td>
+                                                <div class="qty">
+                                                    <form method="POST" action="{% url 'update_cart' item.id %}">
+                                                        {% csrf_token %}
+                                                        <div class="qty">
+                                                            <button type="submit" name="action" value="decrease" class="btn-minus" {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
+                                                            <input type="number" name="quantity" value="{{ item.quantity }}" id="quantity-input" min="1" readonly>
+                                                            <button type="submit" name="action" value="increase" class="btn-plus">+</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                            <td>${{ item.total_price }}</td>
+                                            <td>
+                                                <form method="POST" action="{% url 'remove_from_cart' item.id %}">
+                                                    {% csrf_token %}
+                                                    <button type="submit"><i class="fa fa-trash"></i></button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="cart-page-inner">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="coupon">
+                                        {% if coupon %}
+                                        <form method="POST" action="{% url 'cart' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="remove_coupon" value="true">
+                                            <button type="submit">Remove Code</button>
+                                        </form>
+                                        {% else %}
+                                        <form method="POST" action="{% url 'cart' %}">
+                                            {% csrf_token %}
+                                            <input type="text" name="coupon_code" placeholder="Coupon Code">
+                                            <button type="submit">Apply Code</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="cart-summary">
+                                        <div class="cart-content">
+                                            <h1>Cart Summary</h1>
+                                            <p>Sub Total<span>${{ total_price }}</span></p>
+                                            <p>Shipping Cost<span>${{ shipping_cost }}</span></p>
+                            
+                                            {% if discount > 0 %}
+                                                <p>Discount Applied: <span>-${{ discount }}</span></p>
+                                            {% endif %}
+                            
+                                            <h2>Grand Total<span>${{ grand_total }}</span></h2>
+                                        </div>
+                                        <div class="cart-btn mt-3">
+                                            <a href="{% url 'Checkout' %}" 
+                                               class="btn btn-modern px-4 py-2 d-flex align-items-center justify-content-center">
+                                                <i class="fa fa-shopping-cart me-2"></i> Checkout
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Cart End -->
+        
+        {% include 'inc/footer.html'%}          
+        
+        <!-- Back to Top -->
+        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+        
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{% static 'lib/easing/easing.min.js'%}"></script>
+        <script src="{% static 'lib/slick/slick.min.js'%}"></script>
+        
+        <!-- Template Javascript -->
+        <script src="{% static 'js/main.js'%}"></script>
+        <script>
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        
+            const csrftoken = getCookie('csrftoken');
+        
+            fetch('/some-url/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                },
+                body: JSON.stringify({ action: 'increase' }),
+            });
+        </script>
+        
+    </body>
+</html>

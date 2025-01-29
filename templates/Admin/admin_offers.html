@@ -1,0 +1,155 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offers Management</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+    
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        .dashboard-header h1 {
+            margin: 0;
+        }
+    
+        .add-offer-btn,
+        .table-actions button {
+            background-color: #4CAF50;
+            color: white;
+            border-collapse: collapse;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+    
+        .add-offer-btn:hover,
+        .table-actions button:hover {
+            background-color: #45a049;
+        }
+    
+        table {
+            width: 100%;
+            border: none;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+    
+        table th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+    
+        .filter-sort,
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+    
+        .filter-sort select,
+        .filter-sort input,
+        .table-actions input[type="text"],
+        .table-actions select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop - Offers Management</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Offers Management</h1>
+            
+        </div>
+
+        <div class="filter-sort">
+            <a href="{% url 'add_offer' %}" class="add-offer-btn">+ Add New Offer</a>
+            <div>
+                <label for="filter">Filter:</label>
+                <select id="filter" onchange="applyFilter()">
+                    <option value="all" {% if request.GET.filter == "all" %}selected{% endif %}>All</option>
+                    <option value="product" {% if request.GET.filter == "product" %}selected{% endif %}>Product Offer</option>
+                    <option value="category" {% if request.GET.filter == "category" %}selected{% endif %}>Category Offer</option>
+                    <option value="referral" {% if request.GET.filter == "referral" %}selected{% endif %}>Referral Offer</option>
+                </select>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Offer Type</th>
+                    <th>Offer Code</th>
+                    <th>Discount Type</th>
+                    <th>Discount Value</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Is Referral Offer</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                    <tr>
+                        <td>{{ offer.offer_type }}</td>
+                        <td>{{ offer.offer_code }}</td>
+                        <td>{{ offer.discount_type }}</td>
+                        <td>{{ offer.discount_value }}</td>
+                        <td>{{ offer.starting_date }}</td>
+                        <td>{{ offer.expiration_date }}</td>
+                        <td>{{ offer.is_referral_offer }}</td>
+                        <td>
+                            <a href="{% url 'edit_offer' offer.id %}" style="text-decoration: none;">
+                                <i class="edit-icon">✏️</i>
+                            </a>
+                            <a href="{% url 'delete_offer' offer.id %}" onclick="return confirm('Are you sure you want to delete this offer?');" style="text-decoration: none;"><i class="delete-icon">❌</i></a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No offers available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+    <script>
+        function applyFilter() {
+            const filter = document.getElementById('filter').value;
+            window.location.href = `?filter=${filter}`;
+        }
+    </script>
+
+</body>
+</html>

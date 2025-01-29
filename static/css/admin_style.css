@@ -1,0 +1,93 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+.header {
+background-color: #ff3333;
+color: #000000;
+text-align: left;
+padding: 10px 20px;
+}
+
+.header h1 {
+margin: 0;
+font-size: 30px;
+}
+.sidebar {
+    display: block;
+    float: left;
+    width: 250px;
+    height: 100%;
+    background-color: #ffffff;
+    padding: 20px 0;
+}
+.sidebar a {
+    display: block;
+    color: rgb(0, 0, 0);
+    background-color: #ff3333;
+    padding: 10px 30px;
+    text-decoration: none;
+    font-size: 18px;
+    border: 1px solid black;
+    border-radius: 80px;
+    margin: 7px;
+}
+.sidebar a:hover {
+    background-color: #000000;
+    color: #ffffff;
+}
+.sidebar-bottom {
+    
+    margin-top: 120px;
+}
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+}
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.dashboard-header h1 {
+    margin: 0;
+}
+.content {
+    display: flex;
+    margin-top: 20px;
+}
+.graph-container {
+    flex: 3;
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.recent-sales {
+    flex: 2;
+    background-color: white;
+    margin-left: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.count-boxes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.count-box {
+    background-color: white;
+    flex: 1;
+    padding: 20px;
+    text-align: center;
+    margin-right: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.count-box:last-child {
+    margin-right: 0;
+}
+.sidebar-bottom a:hover {
+    background-color: #000000;
+    color: #ffffff;
+}

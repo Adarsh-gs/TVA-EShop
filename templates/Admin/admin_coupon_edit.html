@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Management</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+                .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            margin: 0;
+        }
+        .add-coupon-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .add-coupon-btn:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #ff3333;
+            color: white;
+        }
+        .filter-sort {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .filter-sort select, .filter-sort input {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop - Coupon Management</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Coupon Management</h1>
+            <button class="add-coupon-btn" onclick="openAddCouponForm()">Add New Coupon</button>
+        </div>
+        <div id="editCouponForm" style="margin-top: 20px;">
+            <h2>Edit Coupon</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <label for="code">Code:</label>
+                <input type="text" id="code" name="code" value="{{ coupon.code }}" required><br><br>
+            
+                <label for="type">Type:</label>
+                <select id="type" name="type">
+                    <option value="percent" {% if coupon.discount_type == "percent" %}selected{% endif %}>Percentage</option>
+                    <option value="flat" {% if coupon.discount_type == "flat" %}selected{% endif %}>Flat Amount</option>
+                </select><br><br>
+            
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" name="amount" value="{{ coupon.discount_value }}" required><br><br>
+            
+                <label for="expiry_date">Expiry Date:</label>
+                <input type="date" id="expiry_date" name="expiry_date" value="{{ coupon.expiration_date }}" required><br><br>
+            
+                <button type="submit">Save Changes</button>
+            </form>            
+        </div>
+
+    </div>
+
+    <script>
+        function openAddCouponForm() {
+            document.getElementById('addCouponForm').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,274 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            margin-top: 60px;
+            padding: 20px;
+        }
+        .sidebar {
+            margin-top: -20px;
+        }
+        .nav-link.active {
+            background-color: black;
+            color: white !important;
+        }
+        .products-table-container {
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .table-actions button, .table-actions input[type="text"], .table-actions select {
+            padding: 5px;
+            font-size: 14px;
+        }
+        .table-actions button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .table-actions button:hover {
+            background-color: #218838;
+        }
+        .refresh-icon {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .product-action {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .product-action i {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .product-action a {
+            text-decoration: none;
+        }
+        .product-action i:hover {
+            color: #ff3333;
+        }
+        .error {
+            color: red;
+        }
+        .success {
+            color: green;
+        }
+        .table-actions button, .table-actions input[type="text"], .table-actions select {
+            border-radius: 5px;
+            margin: 0 5px;
+            transition: background-color 0.3s;
+        }
+        .products-table-container {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header fixed-top">
+        <h1>TVA E-Shop</h1>
+    </div>    
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <h1>Products</h1>
+        {% if messages %}
+            <ul>
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <div class="products-table-container">
+            <div class="table-actions">
+                <button id="add-product-btn">+ Add Product</button>
+                <div>
+                    <input type="text" id="search" placeholder="Search products...">
+                    <select id="sort-select">
+                        <option value="name-asc">Sort by Name (A-Z)</option>
+                        <option value="name-desc">Sort by Name (Z-A)</option>
+                    </select>
+                    <button class="refresh-icon" onclick="refreshPage()">🔄</button>
+                </div>
+            </div>
+            <table id="products-table">
+                <thead>
+                    <tr>
+                        <th>S. No.</th>
+                        <th>Product Name</th>
+                        <th>Category</th>
+                        <th>Sale Price</th>
+                        <th>Qty</th>
+                        <th>Main Image</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in products %}
+                    <tr onclick="redirectToProductDetail({{ product.id }})" style="cursor: pointer;">
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ product.product_name }}</td>
+                        <td>{{ product.category.name }}</td>
+                        <td>${{ product.sale_price }}</td>
+                        <td>{{ product.quantity }}</td>
+                        <td>
+                            {% if product.main_image %}
+                                <img src="{{ product.main_image.url }}" alt="Main image for {{ product.product_name }}" width="50" height="50">
+                            {% else %}
+                                No Main Image
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if product.product_images.all %}
+                                {% for image in product.product_images.all %}
+                                   <img src="{{ image.image.url }}" alt="Image for {{ product.product_name }}" width="50" height="50">
+                                {% endfor %}
+                            {% else %}
+                                No Additional Images
+                            {% endif %}
+                        </td>
+                        <td class="product-action">
+                            <a href="{% url 'edit_product' product.id %}">
+                                <i class="edit-icon" data-product-id="{{ product.id }}">✏️</i>
+                            </a>
+                            <i class="delete-icon" data-product-id="{{ product.id }}">❌</i>
+                        </td>                        
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+    
+    <script>
+        function redirectToProductDetail(productId) {
+            const url = `/admin/products/${productId}/`; 
+            window.location.href = url;
+        }
+    </script>
+    
+    
+    <script>
+        const editIcons = document.querySelectorAll('.edit-icon');
+        const deleteIcons = document.querySelectorAll('.delete-icon');
+
+        editIcons.forEach((icon) => {
+            icon.addEventListener('click', function() {
+                const productId = this.dataset.productId;
+                window.location.href = `/edit-product/${productId}/`; 
+            });
+        });
+
+
+        deleteIcons.forEach(icon => {
+            icon.addEventListener('click', function() {
+                const productId = this.dataset.productId; 
+
+                if (confirm('Are you sure you want to delete this product?')) {
+                    fetch(`/delete-product/${productId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken') 
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Product soft-deleted successfully!');
+                            location.reload(); 
+                        } else {
+                            alert('Error deleting product');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.startsWith(name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+
+        // Sort products by name
+        document.getElementById('sort-select').addEventListener('change', function() {
+            const option = this.value;
+            const rows = Array.from(document.querySelectorAll('#products-table tbody tr'));
+
+            rows.sort((rowA, rowB) => {
+                const nameA = rowA.cells[1].textContent.trim();
+                const nameB = rowB.cells[1].textContent.trim();
+
+                if (option === 'name-asc') {
+                    return nameA.localeCompare(nameB);
+                } else {
+                    return nameB.localeCompare(nameA);
+                }
+            });
+
+            const tbody = document.querySelector('#products-table tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        });
+
+        // Filter products (example for demonstration)
+        document.getElementById('search').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#products-table tbody tr');
+
+            rows.forEach(row => {
+                const productName = row.cells[1].textContent.toLowerCase();
+                row.style.display = productName.includes(query) ? '' : 'none';
+            });
+        });
+
+        // Refresh page function
+        function refreshPage() {
+            location.reload();
+        }
+        // Add Product Button
+        document.getElementById('add-product-btn').addEventListener('click', function() {
+            window.location.href = "{% url 'add_product' %}";
+        });
+
+    </script>
+</body>
+</html>

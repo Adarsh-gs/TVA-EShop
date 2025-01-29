@@ -1,0 +1,154 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Report</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            margin: 0;
+        }
+        .table-container {
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .table-controls .sort-filter {
+            display: flex;
+            gap: 10px;
+        }
+        .table-controls button {
+            padding: 5px 10px;
+            font-size: 14px;
+            background-color: #ff3333;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .table-controls button:hover {
+            background-color: #000000;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            text-align: left;
+            padding: 10px;
+        }
+        table th {
+            background-color: #ff3333;
+            color: white;
+        }
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .pagination a {
+            display: inline-block;
+            padding: 5px 10px;
+            margin: 0 5px;
+            text-decoration: none;
+            background-color: #ff3333;
+            color: white;
+            border-radius: 5px;
+        }
+        .pagination a:hover {
+            background-color: #000000;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop Sales Report</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Sales Report</h1>
+        </div>
+
+        <div class="table-container">
+            <div class="table-controls">
+                <div class="download-buttons">
+                    <a href="{% url 'download_report' 'pdf' %}" class="btn">Download PDF</a>
+                    <a href="{% url 'download_report' 'excel' %}" class="btn">Download Excel</a>
+                </div>
+                <div class="filters">
+                    <select id="period-filter">
+                        <option value="">Select Period</option>
+                        <option value="daily">Last 1 Day</option>
+                        <option value="weekly">Last 7 Days</option>
+                        <option value="monthly">Last 1 Month</option>
+                    </select>
+                    <input type="date" id="start-date">
+                    <input type="date" id="end-date">
+                    <button id="filter-btn">Filter</button>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Buyer</th>
+                        <th>Product Name</th>
+                        <th>Product ID</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Category</th>
+                        <th>Unit/Type</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.buyer }}</td>
+                        <td>{{ order.product_name }}</td>
+                        <td>{{ order.product_id }}</td>
+                        <td>{{ order.quantity }}</td>
+                        <td>${{ order.price }}</td>
+                        <td>{{ order.category }}</td>
+                        <td>{{ order.unit_type }}</td>
+                        <td>${{ order.total_price }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9">No orders found for the selected period.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+
+            <div class="pagination">
+                <a href="#">&laquo; Prev</a>
+                <a href="#">1</a>
+                <a href="#">2</a>
+                <a href="#">3</a>
+                <a href="#">Next &raquo;</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

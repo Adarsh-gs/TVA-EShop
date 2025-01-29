@@ -1,0 +1,34 @@
+{% load static%}
+<!-- Bottom Bar Start -->
+<div class="bottom-bar">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-md-3">
+                <div class="logo">
+                    <a href="{% url 'Home_page'%}">
+                        <img src="{% static 'img/Main_logo.png'%}" alt="Logo">
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="search">
+                    <form method="get" action="{% url 'Product_list' %}">
+                        <input type="text" name="q" placeholder="Search" value="{{ request.GET.q }}">
+                        <button type="submit"><i class="fa fa-search"></i></button>
+                    </form>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="user">
+                    <a href="{% url 'Wishlist'%}" class="btn wishlist">
+                        <i class="fa fa-heart"></i>
+                    </a>
+                    <a href="{% url 'cart' %}" class="btn cart">
+                        <i class="fa fa-shopping-cart"></i>
+                    </a>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bottom Bar End --> 

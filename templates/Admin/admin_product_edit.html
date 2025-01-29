@@ -1,0 +1,197 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Product</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container h2 {
+            text-align: center;
+        }
+
+        .form-container form {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .form-container input,
+        .form-container select,
+        .form-container textarea {
+            padding: 10px;
+            font-size: 16px;
+            width: 70%; 
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .form-container textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        .form-container button {
+            grid-column: span 2;
+            padding: 10px 20px;
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .form-container button:hover {
+            background-color: darkgreen;
+        }
+
+        .form-container input[type="file"] {
+            padding: 5px;
+            width: 100%;
+            max-width: 300px; 
+        }
+
+        .image-section {
+            grid-column: span 2;
+        }
+
+        .image-section h3 {
+            margin-bottom: 10px;
+        }
+
+        .existing-images,
+        .new-images {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .existing-images li {
+            position: relative;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .existing-images img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            margin-bottom: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .existing-images label {
+            display: block;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .success {
+            color: green;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>TVA E-Shop</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <h1>Edit Product</h1>
+
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <div class="form-container">
+            <form action="{% url 'edit_product' product.id %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <label for="product_name">Product Name</label>
+                <input type="text" name="product_name" id="product_name" value="{{ product.product_name }}" required>
+                
+                <label for="category">Category</label>
+                <select name="category" id="category" required>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                
+                
+                <label for="description">Description</label>
+                <textarea name="description" id="description" required>{{ product.description }}</textarea>
+                
+                <label for="specification">Specification</label>
+                <textarea name="specification" id="specification" required>{{ product.specification }}</textarea>
+                
+                <label for="product_price">Product Price</label>
+                <input type="number" name="product_price" id="product_price" value="{{ product.product_price }}" required>
+                
+                <label for="sale_price">Sale Price</label>
+                <input type="number" name="sale_price" id="sale_price" value="{{ product.sale_price }}" required>
+                
+                <label for="sizes">Sizes</label>
+                <input type="text" name="sizes" id="sizes" value="{{ sizes_initial }}" placeholder="Enter sizes separated by commas" required>
+                
+                <label for="colors">Colors</label>
+                <input type="text" name="colors" id="colors" value="{{ product.colors }}" placeholder="Enter colors separated by commas" required>
+                
+                <label for="quantity">Quantity</label>
+                <input type="number" name="quantity" id="quantity" value="{{ product.quantity }}" required>
+                
+                <div class="image-section">
+                    <h3>Existing Images</h3>
+                    <ul class="existing-images">
+                        {% for image in existing_images %}
+                            <li>
+                                <img src="{{ image.image.url }}" alt="Image for {{ product.product_name }}">
+                                <label>
+                                    <input type="checkbox" name="delete_images" value="{{ image.id }}">
+                                    Delete
+                                </label>
+                            </li>
+                        {% endfor %}
+                    </ul>
+            
+                    <h3>Upload Additional Product Images</h3>
+                    <input type="file" name="product_images" accept="image/*" multiple>
+                </div>
+                
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

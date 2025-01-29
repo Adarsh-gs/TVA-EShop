@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orders</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .orders-table-container {
+            margin-top: 20px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            padding: 12px 15px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+        .table-actions select {
+            padding: 5px;
+            margin-right: 10px;
+        }
+        .table-actions button {
+            padding: 5px 10px;
+            background-color: #ff3333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .table-actions button:hover {
+            background-color: #000000;
+        }
+        .select-checkbox {
+            width: 20px;
+            height: 20px;
+        }
+        .status-select {
+            padding: 5px;
+            margin-right: 10px;
+        }
+        .cancel-btn {
+            background-color: #ff6666;
+            padding: 5px 10px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .cancel-btn:hover {
+            background-color: #cc0000;
+        }
+
+        .cancel-btn:disabled {
+            background-color: #ccc; /* Light gray for the disabled button */
+            color: #666; /* Dimmed text color */
+            cursor: not-allowed; /* Indicates that the button is not interactive */
+            pointer-events: none; /* Prevents interaction */
+        }
+
+        .cancel-btn:disabled:hover {
+            background-color: #ccc; /* No hover effect when disabled */
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop</h1>
+    </div>
+    {% include 'Admin/inc/sidebar.html' %}
+    <div class="main-content">
+        <h1>Orders</h1>
+        <div class="orders-table-container">
+            <table id="orders-table">
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Amount</th>
+                        <th>Payment</th>
+                        <th>Status</th>
+                        <th>Change Status</th>
+                        <th>Cancel</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>${{ order.total_price }}</td>
+                        <td>{{ order.payment_status }}</td>
+                        <td>{{ order.status }}</td>
+                        <td>
+                            <select class="status-select" onchange="changeStatus(this)" {% if order.status == 'Cancelled' or order.status == 'Delivered' or order.status == 'Returned' %}disabled{% endif %}>
+                                <option value=""></option>
+                                <option value="Processing" {% if order.status == "Processing" %}selected{% endif %}>Processing</option>
+                                <option value="Shipped" {% if order.status == "Shipped" %}selected{% endif %}>Shipped</option>
+                                <option value="Delivered" {% if order.status == "Delivered" %}selected{% endif %}>Delivered</option>
+                            </select>
+                        </td>
+                        <td>
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="order_id" value="{{ order.id }}">
+                                <button type="submit" name="cancel_order" class="cancel-btn" {% if order.status == 'Cancelled' or order.status == 'Delivered' or order.status == 'Returned' %}disabled{% endif %}>Cancel</button>
+                            </form>
+                        </td>                                         
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>            
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('sort-select').addEventListener('change', function() {
+            const option = this.value;
+            const rows = Array.from(document.querySelectorAll('#orders-table tbody tr'));
+
+            rows.sort((rowA, rowB) => {
+                const nameA = rowA.cells[1].textContent.trim();
+                const nameB = rowB.cells[1].textContent.trim();
+
+                if (option === 'name-asc') {
+                    return nameA.localeCompare(nameB);
+                } else {
+                    return nameB.localeCompare(nameA);
+                }
+            });
+
+            const tbody = document.querySelector('#orders-table tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        });
+
+        function cancelOrder(button) {
+        const row = button.closest('tr');
+        const orderId = row.querySelector('input[name="order_id"]').value;
+
+        fetch('/admin/orders/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': '{{ csrf_token }}',
+            },
+            body: `cancel_order=true&order_id=${orderId}`,
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                row.cells[3].textContent = 'Cancelled'; // Update status cell
+                button.disabled = true;
+                button.style.backgroundColor = '#ccc';
+                button.textContent = 'Cancelled';
+                alert('Order has been cancelled.');
+            } else {
+                alert('Failed to cancel order.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    </script>
+    <script>
+        function changeStatus(selectElement) {
+            const orderId = selectElement.closest('tr').querySelector('input[name="order_id"]').value;
+            const newStatus = selectElement.value;
+    
+            fetch("{% url 'update_order_status' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for POST requests
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Order status updated to ${newStatus}`);
+                } else {
+                    alert('Failed to update order status. Try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the order status.');
+            });
+        }
+    </script>
+    
+</body>
+</html>

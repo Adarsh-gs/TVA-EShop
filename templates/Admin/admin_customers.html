@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers Page</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            margin: 0;
+        }
+        .filter-sort {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .filter-sort select, .filter-sort input {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            text-align: center;
+            padding: 10px;
+        }
+        table th {
+            background-color: #ff3333;
+            color: white;
+        }
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .pagination a {
+            margin: 0 5px;
+            padding: 10px 15px;
+            background-color: #ff3333;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .pagination a.active {
+            background-color: #000000;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Customers</h1>
+        </div>
+
+        <div class="filter-sort">
+            <div>
+                <label for="filter">Filter by Status:</label>
+                <select id="filter" name="filter">
+                    <option value="">All</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                </select>
+            </div>
+            <div>
+                <label for="sort">Sort by Name:</label>
+                <select id="sort" name="sort">
+                    <option value="asc">Ascending</option>
+                    <option value="desc">Descending</option>
+                </select>
+            </div>
+        </div>
+        {% if messages %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                    {% for customer in customers %}
+                    <tr>
+                        <td>{{ customer.sno }}</td>
+                        <td>{{ customer.user }}</td>
+                        <td>{{ customer.user.email }}</td>
+                        <td>
+                            {% if customer.is_active %}
+                                Active
+                            {% else %}
+                                Inactive
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if customer.is_active %}
+                                <a href="{% url 'block_customer' customer.sno %}">Block</a>
+                            {% else %}
+                                <a href="{% url 'unblock_customer' customer.sno %}">Unblock</a>
+                            {% endif %}
+                        </td>
+                                              
+                    </tr>
+                    {% endfor %}
+                </tbody>
+        </table>
+        
+        <div class="pagination">
+            {% if customers.has_previous %}
+                <a href="?page={{ customers.previous_page_number }}">&laquo; Prev</a>
+            {% endif %}
+
+            {% for num in customers.paginator.page_range %}
+                <a href="?page={{ num }}" class="{% if num == customers.number %}active{% endif %}">{{ num }}</a>
+            {% endfor %}
+
+            {% if customers.has_next %}
+                <a href="?page={{ customers.next_page_number }}">Next &raquo;</a>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('filter').addEventListener('change', function() {
+            let filterValue = this.value;
+            let sortValue = document.getElementById('sort').value;
+            window.location.href = `?filter=${filterValue}&sort=${sortValue}`;
+        });
+    
+        document.getElementById('sort').addEventListener('change', function() {
+            let sortValue = this.value;
+            let filterValue = document.getElementById('filter').value;
+            window.location.href = `?filter=${filterValue}&sort=${sortValue}`;
+        });
+    </script>
+    
+</body>
+</html>

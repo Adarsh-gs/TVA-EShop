@@ -1,0 +1,324 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>TVA E-Shop</title>
+        <meta content="width=device-width, initial-scale=1.0" name="viewport">
+        <meta content="TVA E-Shop, online shopping, electronics, fashion, deals" name="keywords">
+        <meta content="Shop the latest electronics, fashion, and more at TVA E-Shop. Discover exclusive deals and fast delivery!" name="description">
+
+        <!-- Favicon -->
+        <link href="{% static 'img/favicon.ico'%}" rel="icon">
+
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
+
+        <!-- CSS Libraries -->
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+        <link href="{% static 'lib/slick/slick.css'%}" rel="stylesheet">
+        <link href="{% static 'lib/slick/slick-theme.css'%}" rel="stylesheet">
+
+        <!-- Template Stylesheet -->
+        <link href="{% static 'css/style.css'%}" rel="stylesheet">
+                                    
+        <style>
+            .form-group {
+                margin-bottom: 1rem;
+            }
+        
+
+        
+            .mt-4 {
+                margin-top: 2rem;
+            }
+        
+            .d-flex {
+                display: flex;
+                gap: 2rem;
+            }
+        
+            .profile-section, .password-section {
+                flex: 1;
+            }
+
+        </style> 
+    </head>
+    <body>
+        {% include 'inc/topbar.html'%} 
+        <!-- Nav Bar Start -->
+        <div class="nav">
+            <div class="container-fluid">
+                <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+                    <a href="#" class="navbar-brand">MENU</a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto">
+                            <a href="{% url 'Home_page'%}" class="nav-item nav-link">Home</a>
+                            <a href="{% url 'Product_list'%}" class="nav-item nav-link">Products</a>
+                            <a href="{% url 'cart'%}" class="nav-item nav-link">Cart</a>
+                            <a href="{% url 'Checkout'%}" class="nav-item nav-link">Checkout</a>
+                            <a href="{% url 'My_account'%}" class="nav-item nav-link active">My Account</a>
+                            <div class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
+                                <div class="dropdown-menu">
+                                    <a href="{% url 'Wishlist'%}" class="dropdown-item">Wishlist</a>
+                                    
+                                    <a href="{% url 'contact' %}" class="dropdown-item">Contact Us</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="navbar-nav ml-auto">
+                            <div class="nav-item dropdown">
+                                <a href="{% url 'logout_view' %}" class="nav-link">Logout</a>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <!-- Nav Bar End -->   
+        {% include 'inc/bottombar.html'%}  
+        
+        <!-- Breadcrumb Start -->
+        <div class="breadcrumb-wrap">
+            <div class="container-fluid">
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'Home_page'%}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'Product_list'%}">Products</a></li>
+                    <li class="breadcrumb-item active">My Account</li>
+                </ul>
+            </div>
+        </div>
+        <!-- Breadcrumb End -->
+        
+        <!-- My Account Start -->
+        <div class="my-account">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="nav flex-column nav-pills" role="tablist" aria-orientation="vertical">
+                            <a class="nav-link active" id="dashboard-nav" data-toggle="pill" href="#dashboard-tab" role="tab"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+                            <a class="nav-link" id="referral-nav" data-toggle="pill" href="#referral-tab" role="tab"><i class="fa fa-shopping-bag"></i> Referral</a>
+                            <a class="nav-link" id="orders-nav" data-toggle="pill" href="#orders-tab" role="tab"><i class="fa fa-shopping-bag"></i> Orders</a>
+                            <a class="nav-link" id="address-nav" data-toggle="pill" href="#address-tab" role="tab"><i class="fa fa-map-marker-alt"></i> Address</a>
+                            <a class="nav-link" id="account-nav" data-toggle="pill" href="#account-tab" role="tab"><i class="fa fa-user"></i> Account Details</a>
+                            <a class="nav-link" href="{% url 'logout_view' %}"><i class="fa fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        {% if messages %}
+                        <div class="alert alert-success">
+                            <ul>
+                                {% for message in messages %}
+                                    <li>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                        <div class="tab-content">
+                        <!-- Dashboard Tab -->
+                        <div id="dashboard-tab" class="tab-pane fade show active">
+                            <h4>Dashboard</h4>
+                            <p>Welcome, {{ request.user.username }}!</p>
+                            <p>Your Wallet Balance: ₹{{ wallet_balance }}
+                        </div>
+                        <!-- referral -->
+                        <div id="referral-tab" class="tab-pane fade">
+                            <h4>Your Referral Code</h4>
+                            <p>Share this code to invite friends: <strong>{{ referral_code }}</strong></p>
+                            <h4 class="mt-4">Your Referrals</h4>
+                            <ul>
+                                {% for user in referred_users %}
+                                    <li>{{ user.username }} ( Joined on {{ user.date_joined|date:"Y-m-d" }} )</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <!-- Orders Tab -->
+                        <div id="orders-tab" class="tab-pane fade">
+                            <h4>Your Orders</h4>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Product</th>
+                                        <th>Date</th>
+                                        <th>Price</th> 
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>
+                                                {% for item in order.orderitem_set.all %}
+                                                    {{ item.product.product_name }} <br> 
+                                                {% endfor %}
+                                            </td>
+                                            <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                                            <td>${{ order.total_price }}</td>
+                                            <td>{{ order.status }}</td>
+                                            <td>
+                                                <form method="POST" action="{% url 'My_account' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="order_id" value="{{ order.id }}">
+                                                    {% if order.status == 'Cancelled' %}
+                                                        <button type="submit" name="cancel_order" class="btn btn-secondary" disabled>Cancelled</button>
+                                                    {% elif order.status == 'Returned' %}
+                                                        <button type="submit" name="return_order" class="btn btn-secondary" disabled>Returned</button>
+                                                    {% elif order.status == 'Delivered' %}
+                                                        <button type="submit" name="return_order" class="btn btn-warning">Return</button>
+                                                    {% else %}
+                                                        <button type="submit" name="cancel_order" class="btn btn-danger">Cancel</button>
+                                                    {% endif %}
+                                                </form>                                            
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                        <!-- Address Tab -->
+                        <div id="address-tab" class="tab-pane fade">
+                            <h4>Your Addresses</h4>
+                            {% if addresses.exists %}
+                                {% for address in addresses %}
+                                    <div class="address-item mt-3">
+                                        <p>{{ address.street }}, {{ address.city }}, {{ address.state }}, {{ address.zip_code }}</p>
+                                        <a href="{% url 'edit_address' address.id %}" class="btn btn-link">Edit</a>
+                                        <form method="post" class="d-inline">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="delete_address" value="{{ address.id }}">
+                                            <button type="submit" class="btn btn-link">Delete</button>
+                                        </form>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p>No address found. Add one below.</p>
+                            {% endif %}
+                            <h4 class="mt-4">Add New Address</h4>
+                            <div id="new-address-form" class="mt-3">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="add_address">
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <label>Address</label>
+                                            <input class="form-control" type="text" name="address" placeholder="Address">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>Country</label>
+                                            <select class="custom-select" name="country">
+                                                <option value="">Select Country</option>
+                                                <option value="United States">United States</option>
+                                                <option value="Afghanistan">Afghanistan</option>
+                                                <option value="Albania">Albania</option>
+                                                <option value="Algeria">Algeria</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>City</label>
+                                            <input class="form-control" type="text" name="city" placeholder="City">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>State</label>
+                                            <input class="form-control" type="text" name="state" placeholder="State">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>ZIP Code</label>
+                                            <input class="form-control" type="text" name="zip" placeholder="ZIP Code">
+                                        </div>
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-primary btn-block">Submit</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>                                  
+                        </div>
+                            <div class="tab-pane fade" id="account-tab" role="tabpanel" aria-labelledby="account-nav">
+                                <div class="d-flex justify-content-between">
+                                    <!-- Profile Tab -->
+                                    <div class="profile-section">
+                                        <h4>Edit Profile</h4>
+                                        <label></label>
+                                        <form method="post" class="profile-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="update_profile">
+                            
+                                            <div class="form-group">
+                                                <label for="first-name">First Name</label>
+                                                <input id="first-name" class="form-control" type="text" name="first_name" value="{{ request.user.first_name }}" placeholder="Enter your first name" required>
+                                            </div>
+                            
+                                            <div class="form-group">
+                                                <label for="last-name">Last Name</label>
+                                                <input id="last-name" class="form-control" type="text" name="last_name" value="{{ request.user.last_name }}" placeholder="Enter your last name" required>
+                                            </div>
+                            
+                                            <div class="form-group">
+                                                <label for="email">Email Address</label>
+                                                <input id="email" class="form-control" type="email" name="email" value="{{ request.user.email }}" placeholder="Enter your email address" required>
+                                            </div>
+                            
+                                            <button type="submit" class="btn btn-primary">Save changes</button>
+                                        </form>
+                                    </div>
+                            
+                                    <!-- Password Tab -->
+                                    <div class="password-section">
+                                        <h4>Change Password</h4>
+                                        <label></label>
+                                        <form method="post" class="password-form">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="change_password">
+                            
+                                            <div class="form-group">
+                                                <label for="current-password">Current Password</label>
+                                                <input id="current-password" class="form-control" type="password" name="current_password" placeholder="Enter your current password" required>
+                                            </div>
+                            
+                                            <div class="form-group">
+                                                <label for="new-password">New Password</label>
+                                                <input id="new-password" class="form-control" type="password" name="new_password" placeholder="Enter a new password" required>
+                                            </div>
+                            
+                                            <div class="form-group">
+                                                <label for="confirm-password">Confirm New Password</label>
+                                                <input id="confirm-password" class="form-control" type="password" name="confirm_password" placeholder="Re-enter the new password" required>
+                                            </div>
+                            
+                                            <button type="submit" class="btn btn-primary">Change Password</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- My Account End -->
+        
+        {% include 'inc/footer.html'%}        
+        
+        <!-- Back to Top -->
+        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+        
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+        <script src="{% static 'lib/easing/easing.min.js'%}"></script>
+        <script src="{% static 'lib/slick/slick.min.js'%}"></script>
+        
+        <!-- Template Javascript -->
+        <script src="{% static 'js/main.js'%}"></script>
+    </body>
+</html>

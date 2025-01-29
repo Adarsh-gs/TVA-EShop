@@ -1,0 +1,127 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Management</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            margin: 0;
+        }
+        .add-category-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .add-category-btn:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #ff3333;
+            color: white;
+        }
+        .list-unlist {
+            cursor: pointer;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+        .list-unlist.list {
+            background-color: #4CAF50;
+        }
+        .list-unlist.unlist {
+            background-color: #f44336;
+        }
+        #addCategoryForm {
+            display: none;
+            margin-top: 20px;
+        }
+        #addCategoryForm form label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        #addCategoryForm form input, 
+        #addCategoryForm form select {
+            width: 100%;
+            padding: 8px;
+            border: none;
+        }
+        #addCategoryForm button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Category Management</h1>
+            <button class="add-category-btn" onclick="window.location.href='{% url 'add_category' %}'">Add New Category</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Category Name</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ category.name }}</td>
+                        <td>
+                            <form method="POST" action="{% url 'toggle_listed_status' category.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="list-unlist {% if category.is_listed %}list{% else %}unlist{% endif %}">
+                                    {% if category.is_listed %}Listed{% else %}Unlisted{% endif %}
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <a href="{% url 'edit_category' category.id %}"><button>✏️</button></a>
+                            <a href="{% url 'soft_delete_category' category.id %}"><button>❌</button></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

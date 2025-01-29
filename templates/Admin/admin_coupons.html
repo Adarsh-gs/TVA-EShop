@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coupon Management</title>
+    <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <style>
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dashboard-header h1 {
+            margin: 0;
+        }
+        .add-coupon-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 14px;
+        }
+        .add-coupon-btn:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 100%;
+            border: none;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    
+        table th,
+        table td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+    
+        table th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+    
+        .filter-sort,
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+    
+        .filter-sort select,
+        .filter-sort input,
+        .table-actions input[type="text"],
+        .table-actions select {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>TVA E-Shop - Coupon Management</h1>
+    </div>
+
+    {% include 'Admin/inc/sidebar.html' %}
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1>Coupon Management</h1>
+        </div>
+
+        <div class="filter-sort">
+            <button class="add-coupon-btn" onclick="openAddCouponForm()">+ Add New Coupon</button>
+            <div>
+                <label for="filter">Filter:</label>
+                <select id="filter" onchange="applyFilter()">
+                    <option value="all" {% if request.GET.filter == "all" %}selected{% endif %}>All</option>
+                    <option value="percentage" {% if request.GET.filter == "percentage" %}selected{% endif %}>Percentage</option>
+                    <option value="fixed" {% if request.GET.filter == "fixed" %}selected{% endif %}>Fixed Amount</option>
+                </select>
+                
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Expiry Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for coupon in coupons %}
+                    <tr>
+                        <td>{{ coupon.code }}</td>
+                        <td>{{ coupon.discount_type }}</td>
+                        <td>{{ coupon.discount_value }}</td>
+                        <td>{{ coupon.expiration_date }}</td>
+                        <td>
+                            <a href="{% url 'edit_coupon' coupon.id %}"><button>Edit</button></a>
+                            <a href="{% url 'delete_coupon' coupon.id %}" onclick="return confirm('Are you sure you want to delete this coupon?');"><button>Delete</button></a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7">No coupons available.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="addCouponForm" style="display: none; margin-top: 20px;">
+            <h2>Add New Coupon</h2>
+            <form method="POST" action="{% url 'admin_add_coupon' %}">
+                {% csrf_token %}
+                <label for="code">Code:</label>
+                <input type="text" id="code" name="code" required><br><br>
+            
+                <label for="type">Type:</label>
+                <select id="type" name="type">
+                    <option value="percent">Percentage</option>
+                    <option value="flat">Fixed Amount</option>
+                </select><br><br>
+            
+                <label for="amount">Discount Value:</label>
+                <input type="number" id="amount" name="amount" step="0.01" required><br><br>
+            
+                <label for="expiry_date">Expiry Date:</label>
+                <input type="date" id="expiry_date" name="expiry_date" required><br><br>
+            
+                <button type="submit">Add</button>
+            </form>
+            
+        </div>
+        
+    </div>
+
+    <script>
+        function openAddCouponForm() {
+            document.getElementById('addCouponForm').style.display = 'block';
+        }
+    </script>
+    <script>
+        function applyFilter() {
+            const filter = document.getElementById('filter').value;
+            window.location.href = `?filter=${filter}`;
+        }
+    </script>
+    
+</body>
+</html>
