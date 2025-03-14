@@ -53,10 +53,42 @@
         .custom-radio1-label:hover {
             color: #FF6F61; 
         }
+        .custom-popup {
+    position: fixed;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #FF6F61;
+    color: rgb(255, 255, 255); 
+    padding: 15px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    z-index: 1000;
+    text-align: center;
+    width: 80%;
+    max-width: 600px;
+    display: none;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 20px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.message-text {
+    margin-right: 20px;
+}
+
         </style>
     </head>
     <body>
-        {% include 'inc/topbar.html'%} 
+        {% include 'inc/topbar.html'%}
         <!-- Nav Bar Start -->
         <div class="nav">
             <div class="container-fluid">
@@ -65,19 +97,19 @@
                     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-
+    
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav mr-auto">
                             <a href="{% url 'Home_page'%}" class="nav-item nav-link">Home</a>
                             <a href="{% url 'Product_list'%}" class="nav-item nav-link">Products</a>
                             <a href="{% url 'cart'%}" class="nav-item nav-link">Cart</a>
-                            <a href="{% url 'Checkout'%}" class="nav-item nav-link active">Checkout</a>
+                            <a href="{% url 'Checkout'%}" class="nav-item nav-link  active">Checkout</a>
+                            <a href="{% url 'order_list'%}" class="nav-item nav-link">Orders</a>
                             <a href="{% url 'My_account'%}" class="nav-item nav-link">My Account</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
                                 <div class="dropdown-menu">
                                     <a href="{% url 'Wishlist'%}" class="dropdown-item">Wishlist</a>
-                                    
                                     <a href="{% url 'contact' %}" class="dropdown-item">Contact Us</a>
                                 </div>
                             </div>
@@ -91,8 +123,8 @@
                 </nav>
             </div>
         </div>
-        <!-- Nav Bar End -->   
-        {% include 'inc/bottombar.html'%}  
+        <!-- Nav Bar End -->
+        {% include 'inc/bottombar.html'%} 
         
         <!-- Breadcrumb Start -->
         <div class="breadcrumb-wrap">
@@ -107,21 +139,22 @@
         <!-- Breadcrumb End -->
     
         <!-- Checkout Start -->
+        {% if messages %}
+        <div id="custom-popup" class="custom-popup">
+            <span class="close-btn" onclick="closePopup()">&times;</span>
+            <div class="message-text">
+                {% for message in messages %}
+                    {{ message }}<br>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
         <div class="checkout">
             <div class="container-fluid"> 
                 <div class="row">
                     <!-- Address Section -->
                     <div class="col-lg-8 order-1 order-lg-1">
                         <div class="checkout-inner">
-                            {% if messages %}
-                                <div class="alert alert-success">
-                                    <ul>
-                                        {% for message in messages %}
-                                            <li>{{ message }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
                             <form method="POST" action="{% url 'Checkout' %}">
                                 {% csrf_token %}
                                 <div class="billing-address">
@@ -165,14 +198,13 @@
                         <div class="checkout-inner">
                             <div class="checkout-summary">
                                 <h1>Cart Total</h1>
-                                <p class="sub-total">Sub Total<span>${{ total_price }}</span></p>
-                                <p class="discount">Shipping Cost<span>${{ shipping_cost }}</span></p>
-                                <h2>Grand Total<span>${{ grand_total }}</span></h2>
+                                <p class="sub-total">Sub Total<span>₹{{ total_price }}</span></p>
+                                <p class="discount">Shipping Cost<span>₹{{ shipping_cost }}</span></p>
+                                <h2>Grand Total<span>₹{{ grand_total }}</span></h2>
                             </div>
                             <div class="checkout-payment">
                                 <div class="payment-methods">
                                     <h1>Payment Methods</h1>
-                                    <!-- Cash on Delivery -->
                                     <div class="payment-method">
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input" id="payment-1" name="payment" value="cod" required>
@@ -194,32 +226,35 @@
                                     <div class="payment-method">
                                         <div class="custom-control custom-radio">
                                             <input type="radio" class="custom-control-input" id="payment-2" name="payment" value="razorpay" required>
-                                            <label class="custom-control-label" for="payment-2">Razorpay</label>
+                                            <label class="custom-control-label" for="payment-2">Pay with Razorpay</label>
                                         </div>
                                         <div class="payment-content" id="payment-2-show">
-                                            <form action="{% url 'order_complete' payment_method='razorpay' %}" method="POST">
-                                                {% csrf_token %} 
-                                                {% if razorpay_order_id %}
-                                                <script
-                                                    src="https://checkout.razorpay.com/v1/checkout.js"
-                                                    data-key="rzp_test_HvfDTnynQgq7lg"
-                                                    data-amount="{{ grand_total_in_paise }}"
-                                                    data-currency="INR"
-                                                    data-order_id="{{ razorpay_order_id }}"
-                                                    data-callback-url="{% url 'order_complete' payment_method='razorpay' razorpay_order_id=razorpay_order_id %}"
-                                                    data-name="TVA E-Shop"
-                                                    data-description="Order Payment"
-                                                    data-theme.color="#FF6F61"
-                                                    data-prefill.name="{{ request.user.username }}"
-                                                    data-prefill.email="{{ request.user.email }}"
-                                                    data-redirect="true"
-                                                ></script>
-                                            {% else %}
-                                                <p class="text-danger">Error: Razorpay Order ID is missing.</p>
-                                            {% endif %}                                            
-                                            </form>                                                                               
+                                            <div class="checkout-btn">
+                                                <form action="{% url 'order_complete' payment_method='razorpay' razorpay_order_id=razorpay_order_id %}" method="POST">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="payment_method" value="razorpay">
+                                                    <button type="button" id="razorpay-btn" class="btn btn-primary btn-block" style="margin-bottom: 15px;" disabled>Pay with Razorpay</button>
+                                                </form>
+                                            </div>                                                                                                                        
                                         </div>
-                                    </div>                                   
+                                    </div>
+
+                                    <!-- Wallet Payment -->
+                                    <div class="payment-method">
+                                        <div class="custom-control custom-radio">
+                                            <input type="radio" class="custom-control-input" id="payment-3" name="payment" value="wallet" required>
+                                            <label class="custom-control-label" for="payment-3">Pay with Wallet</label>
+                                        </div>
+                                        <div class="payment-content" id="payment-3-show">
+                                            <div class="checkout-btn">
+                                                <form id="wallet-payment-form" method="POST" action="{% url 'Checkout' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="payment_method" value="wallet">
+                                                    <button type="submit" id="wallet-btn" class="btn btn-primary btn-block" disabled>Pay with Wallet</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -243,58 +278,182 @@
         <script src="{% static 'js/main.js'%}"></script>
                                         
         <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-        
         <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const paymentMethodInputs = document.querySelectorAll('input[name="payment"]');
-            const placeOrderBtn = document.getElementById('place-order-btn');
-            const paymentMethodField = document.getElementById('payment-method');
-            const checkoutForm = document.getElementById('checkout-form');
-
-            paymentMethodInputs.forEach(input => {
-                input.addEventListener('change', function () {
-                    if (input.checked) {
-                        placeOrderBtn.disabled = false; // Enable the button
-                        paymentMethodField.value = input.value; // Set the hidden field value
-                    }
+            document.addEventListener("DOMContentLoaded", function() {
+            const razorpayBtn = document.getElementById("razorpay-btn");
+            const paymentRadios = document.querySelectorAll("input[name='payment']");
+            
+            paymentRadios.forEach(radio => {
+                radio.addEventListener("change", function() {
+                    razorpayBtn.disabled = this.value !== "razorpay";
                 });
             });
 
-            placeOrderBtn.addEventListener('click', function () {
-                if (paymentMethodField.value) {
-                    checkoutForm.submit(); // Submit the form
-                } else {
-                    alert('Please select a payment method.');
-                }
+            razorpayBtn.addEventListener("click", function() {
+                fetch("{% url 'initiate_razorpay_payment' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": "{{ csrf_token }}",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        grand_total: "{{ grand_total }}",
+                        grand_total_in_paise: "{{ grand_total_in_paise }}"
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        var options = {
+                            "key": "rzp_test_HvfDTnynQgq7lg",
+                            "amount": data.amount,
+                            "currency": "INR",
+                            "name": "TVA E-Shop",
+                            "description": "Order Payment",
+                            "order_id": data.razorpay_order_id,
+                            "handler": function (response) {
+                                var paymentMethod = "razorpay";  
+                                var orderCompleteUrl = `/order-complete/₹{paymentMethod}/₹{data.razorpay_order_id}/`;
+                            
+                                window.location.href = orderCompleteUrl + `?razorpay_payment_id=₹{response.razorpay_payment_id}`;
+                            },
+
+                            "prefill": {
+                                "name": "{{ request.user.username }}",
+                                "email": "{{ request.user.email }}"
+                            },
+                            "theme": {
+                                "color": "#FF6F61"
+                            }
+                        };
+                        var rzp1 = new Razorpay(options);
+                        rzp1.open();
+                    } else {
+                        alert("Payment initiation failed. Please try again.");
+                    }
+                })
+                .catch(error => console.error("Error initiating Razorpay:", error));
             });
         });
 
-
-
-            window.addEventListener('message', function (event) {
-                if (event.origin === 'https://checkout.razorpay.com' && event.data.status === 'success') {
-                    enablePlaceOrderButton();
-                    window.location.href = "{% url 'Checkout' %}"; 
-                }
-            });
-            document.querySelectorAll('input[name="payment"]').forEach((radio) => {
-            radio.addEventListener('change', () => {
-                document.getElementById('place-order-btn').disabled = false;
-                document.getElementById('payment-method').value = radio.value;
-            });
-        });
-        document.getElementById('place-order-btn').addEventListener('click', () => {
-            const form = document.getElementById('checkout-form');
-            const selectedPaymentMethod = document.querySelector('input[name="payment"]:checked');
-
-            if (!selectedPaymentMethod) {
-                alert('Please select a payment method.');
-                return;
-            }
-
-            form.submit();
-        });
         </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const paymentMethodInputs = document.querySelectorAll('input[name="payment"]');
+                const placeOrderBtn = document.getElementById('place-order-btn');
+                const paymentMethodField = document.getElementById('payment-method');
+                const checkoutForm = document.getElementById('checkout-form');
+
+                paymentMethodInputs.forEach(input => {
+                    input.addEventListener('change', function () {
+                        if (input.checked) {
+                            placeOrderBtn.disabled = false;
+                            paymentMethodField.value = input.value;
+                        }
+                    });
+                });
+                placeOrderBtn.addEventListener('click', function () {
+                    if (paymentMethodField.value) {
+                        checkoutForm.submit();
+                    }
+                });
+            });
+            window.addEventListener('message', function (event) {
+                if (event.origin === 'https://checkout.razorpay.com') {
+                    console.log("🔹 Razorpay event received:", event.data);
+                    
+                    if (event.data.razorpay_payment_id) {
+                        let paymentForm = document.createElement('form');
+                        paymentForm.method = "POST";
+                        paymentForm.action = "{% url 'order_complete' payment_method='razorpay' razorpay_order_id=razorpay_order_id %}";
+
+                        let csrfInput = document.createElement('input');
+                        csrfInput.type = "hidden";
+                        csrfInput.name = "csrfmiddlewaretoken";
+                        csrfInput.value = "{{ csrf_token }}";
+
+                        let paymentIdInput = document.createElement('input');
+                        paymentIdInput.type = "hidden";
+                        paymentIdInput.name = "razorpay_payment_id";
+                        paymentIdInput.value = event.data.razorpay_payment_id;
+
+                        let statusInput = document.createElement('input');
+                        statusInput.type = "hidden";
+                        statusInput.name = "status";
+                        statusInput.value = "success";
+
+                        paymentForm.appendChild(csrfInput);
+                        paymentForm.appendChild(paymentIdInput);
+                        paymentForm.appendChild(statusInput);
+                        document.body.appendChild(paymentForm);
+                        paymentForm.submit();
+                    } else {
+                        console.log("🔴 Payment failed or canceled.");
+                    }
+                }
+            });
+
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const placeOrderBtn = document.getElementById("place-order-btn");
+                const razorpayBtn = document.getElementById("razorpay-btn");
+                const addressRadios = document.querySelectorAll("input[name='selected_address']");
+                const paymentMethods = document.querySelectorAll("input[name='payment']");
+                const walletBtn = document.getElementById("wallet-btn");
         
+                function checkSelection() {
+                    let isAddressSelected = false;
+                    let isPaymentSelected = false;
+        
+                    addressRadios.forEach((radio) => {
+                        if (radio.checked) {
+                            isAddressSelected = true;
+                        }
+                    });
+        
+                    paymentMethods.forEach((radio) => {
+                        if (radio.checked) {
+                            isPaymentSelected = true;
+                        }
+                    });
+        
+                    placeOrderBtn.disabled = !(isAddressSelected && isPaymentSelected);
+                    razorpayBtn.disabled = !(isAddressSelected && isPaymentSelected);
+                    walletBtn.disabled = !(isAddressSelected && isPaymentSelected);
+                }
+        
+                addressRadios.forEach((radio) => {
+                    radio.addEventListener("change", checkSelection);
+                });
+        
+                paymentMethods.forEach((radio) => {
+                    radio.addEventListener("change", checkSelection);
+                });
+        
+                checkSelection(); 
+            });
+
+        </script>       
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        var popup = document.getElementById("custom-popup");
+                        if (popup) {
+                            popup.style.display = "block";  // Show the popup
+                
+                            // Auto-hide after 5 seconds
+                            setTimeout(function () {
+                                closePopup();
+                            }, 5000);
+                        }
+                    });
+                
+                    function closePopup() {
+                        var popup = document.getElementById("custom-popup");
+                        if (popup) {
+                            popup.style.display = "none";
+                        }
+                    }
+                </script> 
     </body>
 </html>

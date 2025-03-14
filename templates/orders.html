@@ -1,0 +1,269 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>TVA E-Shop - Orders</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="TVA E-Shop, online shopping, electronics, fashion, deals" name="keywords">
+    <meta content="Shop the latest electronics, fashion, and more at TVA E-Shop. Discover exclusive deals and fast delivery!" name="description">
+
+    <!-- Favicon -->
+    <link href="{% static 'img/favicon.ico' %}" rel="icon">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
+
+    <!-- CSS Libraries -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'lib/slick/slick.css' %}" rel="stylesheet">
+    <link href="{% static 'lib/slick/slick-theme.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <style>
+        .custom-popup {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff7b6f;
+            color: rgb(255, 255, 255);
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            font-weight: bold;
+            z-index: 1000;
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            display: none;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .message-text {
+            margin-right: 20px;
+        }
+        .action-buttons form {
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'inc/topbar.html'%}
+    <!-- Nav Bar Start -->
+    <div class="nav">
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+                <a href="#" class="navbar-brand">MENU</a>
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                    <div class="navbar-nav mr-auto">
+                        <a href="{% url 'Home_page'%}" class="nav-item nav-link">Home</a>
+                        <a href="{% url 'Product_list'%}" class="nav-item nav-link">Products</a>
+                        <a href="{% url 'cart'%}" class="nav-item nav-link">Cart</a>
+                        <a href="{% url 'Checkout'%}" class="nav-item nav-link">Checkout</a>
+                        <a href="{% url 'order_list'%}" class="nav-item nav-link active">Orders</a>
+                        <a href="{% url 'My_account'%}" class="nav-item nav-link">My Account</a>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
+                            <div class="dropdown-menu">
+                                <a href="{% url 'Wishlist'%}" class="dropdown-item">Wishlist</a>
+                                <a href="{% url 'contact' %}" class="dropdown-item">Contact Us</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="navbar-nav ml-auto">
+                        <div class="nav-item dropdown">
+                            <a href="{% url 'logout_view' %}" class="nav-link">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Nav Bar End -->
+    {% include 'inc/bottombar.html'%}
+
+    <!-- Breadcrumb Start -->
+    <div class="breadcrumb-wrap">
+        <div class="container-fluid">
+            <ul class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'Home_page' %}">Home</a></li>
+                <li class="breadcrumb-item"><a href="{% url 'Product_list' %}">Products</a></li>
+                <li class="breadcrumb-item active">Orders</li>
+            </ul>
+        </div>
+    </div>
+    <!-- Breadcrumb End -->
+
+    <!-- Orders Start -->
+    {% if messages %}
+    <div id="custom-popup" class="custom-popup">
+        <span class="close-btn" onclick="closePopup()">×</span>
+        <div class="message-text">
+            {% for message in messages %}
+                {{ message }}<br>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    <div class="wishlist-page">
+        <div class="container-fluid">
+            <div class="wishlist-page-inner  mb-5">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Product</th>
+                                        <th>Product Name</th>
+                                        <th>Date & Time</th>
+                                        <th>Price</th>
+                                        <th>Item Status</th>
+                                        <th>Action</th>
+                                        <th>Invoice</th>
+                                        <th>Payment</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="align-middle">
+                                    {% for order in orders %}
+                                        {% with order_items=order.orderitem_set.all %}
+                                            {% for order_item in order_items %}
+                                                <tr>
+                                                    {% if forloop.first %}
+                                                        <td rowspan="{{ order_items|length }}">{{ forloop.parentloop.counter }}</td>
+                                                    {% endif %}
+                                                    <td>
+                                                        <a href="{% url 'product_detail' order_item.product.id %}">
+                                                            <img src="{{ order_item.product.main_image.url }}" alt="{{ order_item.product.product_name }}" width="50">
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{% url 'product_detail' order_item.product.id %}">
+                                                            {{ order_item.product.product_name }} (x{{ order_item.quantity }})
+                                                        </a>
+                                                    </td>
+                                                    {% if forloop.first %}
+                                                        <td rowspan="{{ order_items|length }}">{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                                                        <td rowspan="{{ order_items|length }}">₹{{ order.total_price }}</td>
+                                                    {% endif %}
+                                                    <td>{{ order_item.status }}</td>
+                                                    <td class="action-buttons">
+                                                        {% if order_item.status == 'Cancelled' %}
+                                                            <button class="btn btn-secondary" disabled style="width: 100px; background-color: #b9b9b9; color: black;">Cancelled</button>
+                                                        {% elif order_item.status == 'Returned' %}
+                                                            <button class="btn btn-secondary" disabled style="width: 100px; background-color: #b9b9b9; color: black;">Returned</button>
+                                                        {% elif order_item.status == 'Delivered' %}
+                                                            <form method="POST" action="{% url 'order_list' %}">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="item_id" value="{{ order_item.id }}">
+                                                                <button type="submit" name="return_item" class="btn btn-warning" style="width: 100px;">Return</button>
+                                                            </form>
+                                                        {% elif order_item.status != 'Delivered' %}
+                                                            <form method="POST" action="{% url 'order_list' %}">
+                                                                {% csrf_token %}
+                                                                <input type="hidden" name="item_id" value="{{ order_item.id }}">
+                                                                <button type="submit" name="cancel_item" class="btn btn-danger" style="width: 100px;">Cancel</button>
+                                                            </form>
+                                                        {% endif %}
+                                                    </td>
+                                                    {% if forloop.first %}
+                                                        <td rowspan="{{ order_items|length }}">
+                                                            {% if order.payment_status == 'Cancelled' %}
+                                                                <button class="btn btn-warning btn-sm" disabled style="width: 120px; background-color: #b9b9b9; color: black;">Invoice</button>
+                                                            {% else %}
+                                                                <a href="{% url 'download_invoice' order.id %}" class="btn btn-success btn-sm" style="width: 120px;">Invoice</a>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td rowspan="{{ order_items|length }}">
+                                                            {% if order.payment_status == "Pending" %}
+                                                                <a href="{% url 'continue_payment' order.id %}" class="btn btn-warning btn-sm" style="width: 140px;">Pay Now</a>
+                                                            {% elif order.payment_status == "Cancelled" %}
+                                                                <button class="btn btn-warning btn-sm" disabled style="width: 140px; background-color: #b9b9b9; color: black;">Cancelled</button>
+                                                            {% else %}
+                                                                <button class="btn btn-warning btn-sm" disabled style="width: 140px; background-color: #b9b9b9; color: black;">Already Paid</button>
+                                                            {% endif %}
+                                                        </td>
+                                                    {% endif %}
+                                                </tr>
+                                            {% empty %}
+                                                <tr>
+                                                    <td>{{ forloop.counter }}</td>
+                                                    <td colspan="2">No items</td>
+                                                    <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+                                                    <td>₹{{ order.total_price }}</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>
+                                                        <a href="{% url 'download_invoice' order.id %}" class="btn btn-success btn-sm" style="width: 120px;">Invoice</a>
+                                                    </td>
+                                                    <td>
+                                                        {% if order.payment_status == "Pending" %}
+                                                            <a href="{% url 'continue_payment' order.id %}" class="btn btn-warning btn-sm" style="width: 140px;">Pay Now</a>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
+                                        {% endwith %}
+                                    {% empty %}
+                                        <tr>
+                                            <td colspan="9">You have no orders.</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Orders End -->
+
+        {% include 'inc/footer.html' %}
+
+        <!-- Back to Top -->
+        <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
+
+        <!-- JavaScript Libraries -->
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+        <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+        <script src="{% static 'lib/slick/slick.min.js' %}"></script>
+
+        <!-- Template Javascript -->
+        <script src="{% static 'js/main.js' %}"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var popup = document.getElementById("custom-popup");
+                if (popup) {
+                    popup.style.display = "block";
+                    setTimeout(function () {
+                        closePopup();
+                    }, 5000);
+                }
+            });
+
+            function closePopup() {
+                var popup = document.getElementById("custom-popup");
+                if (popup) {
+                    popup.style.display = "none";
+                }
+            }
+        </script>
+    </body>
+</html>

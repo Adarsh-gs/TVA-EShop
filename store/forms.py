@@ -40,11 +40,3 @@ class MultiFileInput(ClearableFileInput):
 
 class CouponForm(forms.Form):
     coupon_code = forms.CharField(max_length=50, required=False)
-
-class OfferForm(forms.ModelForm):
-    class Meta:
-        model = Offer
-        fields = ['offer_code', 'offer_type', 'discount_type', 'discount_value', 'starting_date', 'expiration_date','is_referral_offer']
-
-    starting_date = forms.DateField(input_formats=['%Y-%m-%d'], required=True)
-    expiration_date = forms.DateField(input_formats=['%Y-%m-%d'], required=True)

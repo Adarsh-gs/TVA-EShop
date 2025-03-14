@@ -4,66 +4,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customers Page</title>
+    <title>Admin Customers</title>
     <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 500;
+        }
         .main-content {
-            margin-left: 250px;
-            padding: 20px;
+            margin-left: 250px; 
+            padding: 80px 20px 20px 20px; 
+            min-height: 100vh;
+            box-sizing: border-box;
+            max-width: 1200px; 
+            margin-right: auto; 
         }
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 25px;
         }
         .dashboard-header h1 {
             margin: 0;
+            font-size: 2em;
+            color: #FF6F61;
         }
         .filter-sort {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        .filter-sort label {
+            margin-right: 10px;
+            font-weight: 500;
+            color: #333;
         }
         .filter-sort select, .filter-sort input {
-            padding: 5px 10px;
-            font-size: 16px;
+            padding: 8px 12px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        .filter-sort select:focus {
+            border-color: #FF6F61;
+            outline: none;
+        }
+        .alert {
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            background-color: #ffe6e6;
+            color: #d9534f;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .alert ul {
+            margin: 0;
+            padding-left: 20px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden; 
         }
         table th, table td {
-            border: 1px solid #ddd;
+            border: 1px solid #eee;
             text-align: center;
-            padding: 10px;
+            padding: 12px;
         }
         table th {
-            background-color: #ff3333;
+            background-color: #FF6F61;
+            color: white;
+            font-weight: 600;
+        }
+        table td {
+            color: #333;
+        }
+        table tr:hover {
+            background-color: #fff5f4; 
+        }
+        table a {
+            color: #FF6F61;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: background-color 0.3s;
+        }
+        table a:hover {
+            background-color: #FF6F61;
             color: white;
         }
+
         .pagination {
             display: flex;
             justify-content: center;
-            margin: 20px 0;
+            gap: 10px;
+            margin: 25px 0;
+            flex-wrap: wrap;
         }
         .pagination a {
-            margin: 0 5px;
-            padding: 10px 15px;
-            background-color: #ff3333;
+            padding: 8px 15px;
+            background-color: #FF6F61;
             color: white;
             text-decoration: none;
             border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .pagination a:hover {
+            background-color: #e65b50;
         }
         .pagination a.active {
-            background-color: #000000;
-            color: #ffffff;
+            background-color: #333;
+            color: white;
+            font-weight: bold;
+        }
+        @media (max-width: 767px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .filter-sort {
+                flex-direction: column;
+                gap: 15px;
+            }
+            table th, table td {
+                font-size: 0.9em;
+                padding: 8px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
+    <div class="header fixed-top">
         <h1>TVA E-Shop</h1>
     </div>
 
@@ -78,19 +178,20 @@
             <div>
                 <label for="filter">Filter by Status:</label>
                 <select id="filter" name="filter">
-                    <option value="">All</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="" {% if not request.GET.filter %}selected{% endif %}>All</option>
+                    <option value="active" {% if request.GET.filter == 'active' %}selected{% endif %}>Active</option>
+                    <option value="inactive" {% if request.GET.filter == 'inactive' %}selected{% endif %}>Inactive</option>
                 </select>
             </div>
             <div>
                 <label for="sort">Sort by Name:</label>
                 <select id="sort" name="sort">
-                    <option value="asc">Ascending</option>
-                    <option value="desc">Descending</option>
+                    <option value="asc" {% if request.GET.sort == 'asc' %}selected{% endif %}>Ascending</option>
+                    <option value="desc" {% if request.GET.sort == 'desc' %}selected{% endif %}>Descending</option>
                 </select>
             </div>
         </div>
+
         {% if messages %}
             <div class="alert alert-danger">
                 <ul>
@@ -100,6 +201,7 @@
                 </ul>
             </div>
         {% endif %}
+
         <table>
             <thead>
                 <tr>
@@ -111,60 +213,60 @@
                 </tr>
             </thead>
             <tbody>
-                    {% for customer in customers %}
-                    <tr>
-                        <td>{{ customer.sno }}</td>
-                        <td>{{ customer.user }}</td>
-                        <td>{{ customer.user.email }}</td>
-                        <td>
-                            {% if customer.is_active %}
-                                Active
-                            {% else %}
-                                Inactive
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if customer.is_active %}
-                                <a href="{% url 'block_customer' customer.sno %}">Block</a>
-                            {% else %}
-                                <a href="{% url 'unblock_customer' customer.sno %}">Unblock</a>
-                            {% endif %}
-                        </td>
-                                              
-                    </tr>
-                    {% endfor %}
-                </tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>{{ customer.sno }}</td>
+                    <td>{{ customer.user }}</td>
+                    <td>{{ customer.user.email }}</td>
+                    <td>
+                        {% if customer.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if customer.is_active %}
+                            <a href="{% url 'block_customer' customer.sno %}" title="Block this customer">Block</a>
+                        {% else %}
+                            <a href="{% url 'unblock_customer' customer.sno %}" title="Unblock this customer">Unblock</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5">No customers found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
-        
+
         <div class="pagination">
             {% if customers.has_previous %}
-                <a href="?page={{ customers.previous_page_number }}">&laquo; Prev</a>
+                <a href="?page={{ customers.previous_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">« Prev</a>
             {% endif %}
 
             {% for num in customers.paginator.page_range %}
-                <a href="?page={{ num }}" class="{% if num == customers.number %}active{% endif %}">{{ num }}</a>
+                <a href="?page={{ num }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}" class="{% if num == customers.number %}active{% endif %}">{{ num }}</a>
             {% endfor %}
 
             {% if customers.has_next %}
-                <a href="?page={{ customers.next_page_number }}">Next &raquo;</a>
+                <a href="?page={{ customers.next_page_number }}{% if request.GET.filter %}&filter={{ request.GET.filter }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">Next »</a>
             {% endif %}
         </div>
-
     </div>
 
     <script>
-        document.getElementById('filter').addEventListener('change', function() {
-            let filterValue = this.value;
-            let sortValue = document.getElementById('sort').value;
-            window.location.href = `?filter=${filterValue}&sort=${sortValue}`;
-        });
-    
-        document.getElementById('sort').addEventListener('change', function() {
-            let sortValue = this.value;
-            let filterValue = document.getElementById('filter').value;
-            window.location.href = `?filter=${filterValue}&sort=${sortValue}`;
-        });
+    document.getElementById('filter').addEventListener('change', function() {
+        let filterValue = this.value;
+        let sortValue = document.getElementById('sort').value;
+        window.location.href = `/admin/customers/?filter=${filterValue}&sort=${sortValue}`;
+    });
+    document.getElementById('sort').addEventListener('change', function() {
+    let sortValue = this.value;
+    let filterValue = document.getElementById('filter').value;
+    window.location.href = `/admin/customers/?filter=${filterValue}&sort=${sortValue}`;
+});
     </script>
-    
 </body>
 </html>

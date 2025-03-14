@@ -4,18 +4,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders</title>
+    <title>Admin Orders</title>
     <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            width: 100%;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 500;
+        }
         .main-content {
             margin-left: 250px;
-            padding: 20px;
+            padding: 80px 20px 20px 20px;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin-right: auto;
+            box-sizing: border-box;
+        }
+        .main-content h1 {
+            color: #FF6F61;
+            font-size: 2em;
+            margin-bottom: 20px;
         }
         .orders-table-container {
-            margin-top: 20px;
             background-color: white;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .table-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .table-actions select {
+            padding: 8px 12px;
+            font-size: 1em;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        .table-actions select:focus {
+            border-color: #FF6F61;
+            outline: none;
         }
         table {
             width: 100%;
@@ -24,60 +78,88 @@
         table th, table td {
             padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #eee;
         }
         table th {
-            background-color: #f4f4f4;
+            background-color: #FF6F61;
+            color: white;
+            font-weight: 600;
+        }
+        table td {
             color: #333;
         }
-        .table-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-bottom: 10px;
-        }
-        .table-actions select {
-            padding: 5px;
-            margin-right: 10px;
-        }
-        .table-actions button {
-            padding: 5px 10px;
-            background-color: #ff3333;
-            color: white;
-            border: none;
-            cursor: pointer;
-        }
-        .table-actions button:hover {
-            background-color: #000000;
-        }
-        .select-checkbox {
-            width: 20px;
-            height: 20px;
+        table tr:hover {
+            background-color: #fff5f4;
         }
         .status-select {
-            padding: 5px;
-            margin-right: 10px;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.95em;
+            transition: border-color 0.3s;
+        }
+        .status-select:focus {
+            border-color: #FF6F61;
+            outline: none;
+        }
+        .status-select:disabled {
+            background-color: #f5f5f5;
+            color: #999;
+            cursor: not-allowed;
         }
         .cancel-btn {
-            background-color: #ff6666;
-            padding: 5px 10px;
+            background-color: #FF6F61;
+            padding: 6px 12px;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s;
+            font-size: 0.95em;
         }
-
         .cancel-btn:hover {
-            background-color: #cc0000;
+            background-color: #e65b50;
         }
-
         .cancel-btn:disabled {
-            background-color: #ccc; /* Light gray for the disabled button */
-            color: #666; /* Dimmed text color */
-            cursor: not-allowed; /* Indicates that the button is not interactive */
-            pointer-events: none; /* Prevents interaction */
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
         }
-
-        .cancel-btn:disabled:hover {
-            background-color: #ccc; /* No hover effect when disabled */
+        .messages {
+            margin: 20px 0;
+        }
+        .alert-success {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .alert-danger {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        @media (max-width: 767px) {
+            .main-content {
+                margin-left: 0;
+                padding: 70px 15px 15px;
+            }
+            .table-actions {
+                justify-content: flex-start;
+                flex-direction: column;
+                align-items: stretch;
+            }
+            table th, table td {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .status-select, .cancel-btn {
+                width: 100%;
+                margin-bottom: 5px;
+            }
         }
     </style>
 </head>
@@ -88,44 +170,80 @@
     {% include 'Admin/inc/sidebar.html' %}
     <div class="main-content">
         <h1>Orders</h1>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="orders-table-container">
+            <div class="table-actions">
+                <select id="sort-select">
+                    <option value="id-asc">Order ID (Low to High)</option>
+                    <option value="id-desc">Order ID (High to Low)</option>
+                </select>
+            </div>
             <table id="orders-table">
                 <thead>
                     <tr>
                         <th>Order ID</th>
+                        <th>Product Name</th>
                         <th>Amount</th>
                         <th>Payment</th>
-                        <th>Status</th>
+                        <th>Item Status</th>
                         <th>Change Status</th>
                         <th>Cancel</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order in orders %}
+                        {% for item in order.orderitem_set.all %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ item.product.product_name }}</td>
+                            <td>${{ order.total_price }}</td>
+                            <td>{{ order.payment_status }}</td>
+                            <td>
+                                <span class="badge {% if item.status == 'Delivered' %}bg-success{% elif item.status == 'Cancelled' %}bg-danger{% else %}bg-warning{% endif %}">
+                                    {{ item.status }}
+                                </span>
+                            </td>
+                            <td>
+                                <form method="POST" action="{% url 'update_order_status' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <select name="status" class="status-select" onchange="updateOptions(this); this.form.submit()">
+                                        <option value="" {% if not item.status %}selected{% endif %}>Select</option>
+                                        <option value="Processing" {% if item.status == 'Processing' %}selected{% endif %}>Processing</option>
+                                        <option value="Shipped" {% if item.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                                        <option value="Delivered" {% if item.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>
+                                <form method="POST" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="item_id" value="{{ item.id }}">
+                                    <button type="submit" name="cancel_item" class="cancel-btn" {% if item.status == 'Cancelled' or item.status == 'Delivered' or item.status == 'Returned' %}disabled{% endif %}>Cancel</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7">No items in this order.</td>
+                        </tr>
+                        {% endfor %}
+                    {% empty %}
                     <tr>
-                        <td>{{ order.id }}</td>
-                        <td>${{ order.total_price }}</td>
-                        <td>{{ order.payment_status }}</td>
-                        <td>{{ order.status }}</td>
-                        <td>
-                            <select class="status-select" onchange="changeStatus(this)" {% if order.status == 'Cancelled' or order.status == 'Delivered' or order.status == 'Returned' %}disabled{% endif %}>
-                                <option value=""></option>
-                                <option value="Processing" {% if order.status == "Processing" %}selected{% endif %}>Processing</option>
-                                <option value="Shipped" {% if order.status == "Shipped" %}selected{% endif %}>Shipped</option>
-                                <option value="Delivered" {% if order.status == "Delivered" %}selected{% endif %}>Delivered</option>
-                            </select>
-                        </td>
-                        <td>
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="order_id" value="{{ order.id }}">
-                                <button type="submit" name="cancel_order" class="cancel-btn" {% if order.status == 'Cancelled' or order.status == 'Delivered' or order.status == 'Returned' %}disabled{% endif %}>Cancel</button>
-                            </form>
-                        </td>                                         
+                        <td colspan="7">No orders found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>            
+            </table>
         </div>
     </div>
 
@@ -133,80 +251,42 @@
         document.getElementById('sort-select').addEventListener('change', function() {
             const option = this.value;
             const rows = Array.from(document.querySelectorAll('#orders-table tbody tr'));
-
             rows.sort((rowA, rowB) => {
-                const nameA = rowA.cells[1].textContent.trim();
-                const nameB = rowB.cells[1].textContent.trim();
-
-                if (option === 'name-asc') {
-                    return nameA.localeCompare(nameB);
-                } else {
-                    return nameB.localeCompare(nameA);
-                }
+                const idA = parseInt(rowA.cells[0].textContent.trim());
+                const idB = parseInt(rowB.cells[0].textContent.trim());
+                return option === 'id-asc' ? idA - idB : idB - idA;
             });
-
             const tbody = document.querySelector('#orders-table tbody');
             rows.forEach(row => tbody.appendChild(row));
         });
-
-        function cancelOrder(button) {
-        const row = button.closest('tr');
-        const orderId = row.querySelector('input[name="order_id"]').value;
-
-        fetch('/admin/orders/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: `cancel_order=true&order_id=${orderId}`,
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                row.cells[3].textContent = 'Cancelled'; // Update status cell
-                button.disabled = true;
-                button.style.backgroundColor = '#ccc';
-                button.textContent = 'Cancelled';
-                alert('Order has been cancelled.');
-            } else {
-                alert('Failed to cancel order.');
-            }
-        })
-        .catch(error => console.error('Error:', error));
-    }
-
     </script>
     <script>
-        function changeStatus(selectElement) {
-            const orderId = selectElement.closest('tr').querySelector('input[name="order_id"]').value;
-            const newStatus = selectElement.value;
+        function updateOptions(selectElement) {
+            const selectedValue = selectElement.value;
+            const options = selectElement.querySelectorAll('option');
     
-            fetch("{% url 'update_order_status' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}' // Include CSRF token for POST requests
-                },
-                body: JSON.stringify({
-                    order_id: orderId,
-                    status: newStatus
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Order status updated to ${newStatus}`);
-                } else {
-                    alert('Failed to update order status. Try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while updating the order status.');
+            options.forEach(option => {
+                option.disabled = false; 
             });
-        }
-    </script>
     
+            if (selectedValue === 'Shipped') {
+                selectElement.querySelector('option[value="Processing"]').disabled = true;
+            } else if (selectedValue === 'Delivered') {
+                selectElement.querySelector('option[value="Processing"]').disabled = true;
+                selectElement.querySelector('option[value="Shipped"]').disabled = true;
+            }
+        }
+    
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.status-select').forEach(select => {
+                updateOptions(select); 
+    
+                const itemStatus = select.closest('tr').querySelector('.badge').textContent.trim();
+                if (['Cancelled', 'Delivered', 'Returned'].includes(itemStatus)) {
+                    select.disabled = true;
+                }
+            });
+        });
+    </script>
 </body>
 </html>

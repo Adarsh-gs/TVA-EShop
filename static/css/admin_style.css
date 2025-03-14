@@ -91,3 +91,21 @@ font-size: 30px;
     background-color: #000000;
     color: #ffffff;
 }
+
+.messages {
+    margin-bottom: 20px;
+}
+.alert {
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+.alert-success {
+    background-color: #28a745;
+    color: white;
+}
+.alert-danger {
+    background-color: #dc3545;
+    color: white;
+}

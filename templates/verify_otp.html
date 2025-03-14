@@ -1,4 +1,5 @@
 {% load static %}
+{% load socialaccount %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -89,6 +90,11 @@
             box-sizing: border-box;
         }
 
+        .otp-content input[disabled] {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+
         .otp-content button {
             background-color: #009e05;
             color: #ffffff;
@@ -115,6 +121,7 @@
             background: none;
             border: none;
             padding: 0;
+            margin: 10px;
         }
 
         .resend-link:disabled {
@@ -126,6 +133,9 @@
             .container_otp {
                 width: 95%;
             }
+        }
+        #timer {
+            display: none;
         }
     </style>
 </head>
@@ -139,7 +149,9 @@
         <div class="otp-content">
             <form method="POST" action="{% url 'verify_otp' %}">
                 {% csrf_token %}
-                <input type="text" name="email_or_mobile" placeholder="Enter your email" required>
+                <label for="email_or_mobile">Email</label>
+                <input type="text" name="email_or_mobile" value="{{ email }}" disabled required>
+                <label for="otp">OTP</label>
                 <input type="text" name="otp" placeholder="Enter OTP" required>
                 <button type="submit">Verify</button>
             </form>
@@ -156,53 +168,66 @@
             <div class="login-footer">
                 <p>Didn't receive the OTP? 
                     <button id="resend-otp-btn" class="resend-link" disabled>Resend OTP</button>
-                    <span id="timer">10</span> seconds
+                    <span id="timer">10 seconds</span>
                 </p>
             </div>
         </div>
     </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const resendButton = document.getElementById('resend-otp-btn');
-            const timerSpan = document.getElementById('timer');
-            let countdown = 10;
+    document.addEventListener('DOMContentLoaded', function () {
+        const resendButton = document.getElementById('resend-otp-btn');
+        const timerSpan = document.getElementById('timer');
+        let countdown = 10;
+        let interval;
 
-            function startCountdown() {
-                resendButton.disabled = true;
-                timerSpan.style.display = 'inline';
-                const interval = setInterval(() => {
-                    countdown--;
-                    timerSpan.textContent = countdown;
-                    if (countdown <= 0) {
-                        clearInterval(interval);
-                        resendButton.disabled = false;
-                        timerSpan.style.display = 'none';
-                    }
-                }, 1000);
-            }
+        function startCountdown() {
+            countdown = 10;
+            resendButton.disabled = true;
+            timerSpan.style.display = 'inline'; // Show timer when countdown starts
+            timerSpan.textContent = `${countdown} seconds`;
 
-            startCountdown();
+            if (interval) clearInterval(interval);
+            interval = setInterval(() => {
+                countdown--;
+                timerSpan.textContent = `${countdown} seconds`;
+                if (countdown <= 0) {
+                    clearInterval(interval);
+                    resendButton.disabled = false;
+                    timerSpan.style.display = 'none'; // Hide timer when countdown ends
+                }
+            }, 1000);
+        }
 
-            resendButton.addEventListener('click', function () {
-                startCountdown();
-                fetch('{% url "resend_otp" %}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                    body: new URLSearchParams({ email_or_mobile: document.querySelector('input[name="email_or_mobile"]').value })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('OTP resent successfully.');
-                    } else {
-                        alert(data.message);
-                    }
-                });
+        startCountdown(); // Start the initial countdown on page load
+
+        resendButton.addEventListener('click', function () {
+            startCountdown(); // Restart countdown and show timer on click
+            fetch('{% url "resend_otp" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({ 'email': '{{ email }}' })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    alert('OTP resent successfully.');
+                } else {
+                    alert(data.message || 'Failed to resend OTP.');
+                }
+            })
+            .catch(error => {
+                console.error('Fetch Error:', error);
+                alert('Error resending OTP. Please try again.');
             });
         });
-
+    });
     </script>
     <!-- JavaScript Libraries -->
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>

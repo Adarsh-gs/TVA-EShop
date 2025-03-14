@@ -236,7 +236,7 @@
                 $('#timer').text('Sending OTP...');
 
                 $.ajax({
-                    url: '{% url "send_otp" %}',  
+                    url: '{% url "send_reset_otp" %}',  
                     type: 'POST',
                     data: {
                         'contact': contact,

@@ -26,8 +26,8 @@
 
 
     <body>
-        {% include 'inc/topbar.html'%} 
-        <!-- Nav Bar Start -->
+        {% include 'inc/topbar.html'%}  
+<!-- Nav Bar Start -->
         <div class="nav">
             <div class="container-fluid">
                 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
@@ -42,6 +42,7 @@
                             <a href="{% url 'Product_list'%}" class="nav-item nav-link">Products</a>
                             <a href="{% url 'cart'%}" class="nav-item nav-link">Cart</a>
                             <a href="{% url 'Checkout'%}" class="nav-item nav-link">Checkout</a>
+                            <a href="{% url 'order_list'%}" class="nav-item nav-link">Orders</a>
                             <a href="{% url 'My_account'%}" class="nav-item nav-link">My Account</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
@@ -60,8 +61,8 @@
                 </nav>
             </div>
         </div>
-        <!-- Nav Bar End -->   
-        {% include 'inc/bottombar.html'%}     
+        <!-- Nav Bar End --> 
+        {% include 'inc/bottombar.html'%}
         
         <!-- Main Slider Start -->
         <div class="header">
@@ -309,7 +310,7 @@
                                     </div>
 
                                     <div class="product-price">
-                                        <h3><span>$</span>{{ product.sale_price }}</h3>
+                                        <h3><span>₹</span>{{ product.sale_price }}</h3>
                                         <a class="btn" href=""><i class="fa fa-shopping-cart"></i>Buy Now</a>
                                     </div>
                                 </div>

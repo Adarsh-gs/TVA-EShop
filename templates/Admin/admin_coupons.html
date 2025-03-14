@@ -4,71 +4,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coupon Management</title>
+    <title>Admin Coupon</title>
     <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            width: 100%;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 500;
+        }
         .main-content {
             margin-left: 250px;
-            padding: 20px;
+            padding: 80px 20px 20px 20px;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin-right: auto;
+            box-sizing: border-box;
         }
         .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 20px;
         }
         .dashboard-header h1 {
             margin: 0;
+            font-size: 2em;
+            color: #FF6F61;
         }
         .add-coupon-btn {
-            background-color: #4CAF50;
+            background-color: #FF6F61;
             color: white;
             padding: 10px 20px;
-            text-decoration: none;
-            border-radius: 5px;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
-            padding: 5px;
-            font-size: 14px;
+            font-size: 1em;
+            transition: background-color 0.3s;
         }
         .add-coupon-btn:hover {
-            background-color: #45a049;
+            background-color: #e65b50;
         }
-        table {
-            width: 100%;
-            border: none;
-            margin-top: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-    
-        table th,
-        table td {
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-            text-align: left;
-        }
-    
-        table th {
-            background-color: #f4f4f4;
-            color: #333;
-        }
-    
-        .filter-sort,
-        .table-actions {
+        .filter-sort {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
+            margin: 20px 0;
+            gap: 15px;
+            flex-wrap: wrap;
         }
-    
-        .filter-sort select,
-        .filter-sort input,
-        .table-actions input[type="text"],
-        .table-actions select {
-            padding: 8px;
-            border: 1px solid #ccc;
+        .filter-sort label {
+            font-weight: 500;
+            color: #333;
+        }
+        .filter-sort select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            font-size: 14px;
+            font-size: 1em;
+            background-color: #fff;
+            transition: border-color 0.3s;
+        }
+        .filter-sort select:focus {
+            border-color: #FF6F61;
+            outline: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        table th, table td {
+            border-bottom: 1px solid #eee;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        table th {
+            background-color: #FF6F61;
+            color: white;
+            font-weight: 600;
+        }
+        table td {
+            color: #333;
+        }
+        table tr:hover {
+            background-color: #fff5f4;
+        }
+        table button {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: background-color 0.3s;
+        }
+        table button:first-child {
+            background-color: #FF6F61;
+            color: white;
+            margin-right: 5px;
+        }
+        table button:first-child:hover {
+            background-color: #e65b50;
+        }
+        table button:last-child { 
+            background-color: #d9534f;
+            color: white;
+        }
+        table button:last-child:hover {
+            background-color: #c9302c;
+        }
+        @media (max-width: 767px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            .filter-sort {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            table th, table td {
+                font-size: 0.9em;
+                padding: 8px;
+            }
         }
     </style>
 </head>
@@ -82,18 +166,27 @@
     <div class="main-content">
         <div class="dashboard-header">
             <h1>Coupon Management</h1>
+            
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}alert-danger{% else %}alert-success{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
         </div>
 
         <div class="filter-sort">
-            <button class="add-coupon-btn" onclick="openAddCouponForm()">+ Add New Coupon</button>
+            <button class="add-coupon-btn" id="add-coupon-btn">+ Add New Coupon</button>
             <div>
-                <label for="filter">Filter:</label>
+                <label for="filter">Filter by Type:</label>
                 <select id="filter" onchange="applyFilter()">
                     <option value="all" {% if request.GET.filter == "all" %}selected{% endif %}>All</option>
                     <option value="percentage" {% if request.GET.filter == "percentage" %}selected{% endif %}>Percentage</option>
                     <option value="fixed" {% if request.GET.filter == "fixed" %}selected{% endif %}>Fixed Amount</option>
                 </select>
-                
             </div>
         </div>
 
@@ -107,12 +200,12 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="coupon-table-body">
                 {% for coupon in coupons %}
                     <tr>
                         <td>{{ coupon.code }}</td>
                         <td>{{ coupon.discount_type }}</td>
-                        <td>{{ coupon.discount_value }}</td>
+                        <td>{{ coupon.discount_value }}{% if coupon.discount_type == 'percentage' %}%{% else %}${% endif %}</td>
                         <td>{{ coupon.expiration_date }}</td>
                         <td>
                             <a href="{% url 'edit_coupon' coupon.id %}"><button>Edit</button></a>
@@ -121,48 +214,29 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="7">No coupons available.</td>
+                        <td colspan="5">No coupons available.</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <div id="addCouponForm" style="display: none; margin-top: 20px;">
-            <h2>Add New Coupon</h2>
-            <form method="POST" action="{% url 'admin_add_coupon' %}">
-                {% csrf_token %}
-                <label for="code">Code:</label>
-                <input type="text" id="code" name="code" required><br><br>
-            
-                <label for="type">Type:</label>
-                <select id="type" name="type">
-                    <option value="percent">Percentage</option>
-                    <option value="flat">Fixed Amount</option>
-                </select><br><br>
-            
-                <label for="amount">Discount Value:</label>
-                <input type="number" id="amount" name="amount" step="0.01" required><br><br>
-            
-                <label for="expiry_date">Expiry Date:</label>
-                <input type="date" id="expiry_date" name="expiry_date" required><br><br>
-            
-                <button type="submit">Add</button>
-            </form>
-            
-        </div>
-        
     </div>
 
-    <script>
-        function openAddCouponForm() {
-            document.getElementById('addCouponForm').style.display = 'block';
-        }
-    </script>
     <script>
         function applyFilter() {
             const filter = document.getElementById('filter').value;
             window.location.href = `?filter=${filter}`;
         }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const addCouponBtn = document.getElementById('add-coupon-btn');
+            if (addCouponBtn) {
+                addCouponBtn.addEventListener('click', function() {
+                    window.location.href = "{% url 'admin_add_coupon' %}";
+                });
+            } else {
+                console.error("Add Coupon button not found!");
+            }
+        });
     </script>
-    
 </body>
 </html>

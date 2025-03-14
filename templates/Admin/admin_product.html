@@ -4,28 +4,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products</title>
+    <title>Admin Products</title>
     <link rel="stylesheet" href="{% static 'css/admin_style.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            z-index: 1030;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            font-weight: 500;
+        }
+
         .main-content {
             margin-left: 250px;
-            margin-top: 60px;
-            padding: 20px;
+            padding: 80px 20px 20px 20px;
+            min-height: 100vh;
+            max-width: 1200px;
+            margin-right: auto;
+            box-sizing: border-box;
         }
-        .sidebar {
-            margin-top: -20px;
+        .main-content h1 {
+            color: #FF6F61;
+            font-size: 2em;
+            margin-bottom: 20px;
         }
-        .nav-link.active {
-            background-color: black;
-            color: white !important;
+        .messages {
+            margin-bottom: 20px;
+        }
+        .messages li.success {
+            color: #28a745;
+            background-color: #e6ffe6;
+            padding: 10px 15px;
+            border-radius: 5px;
+            list-style: none;
+        }
+        .messages li.error {
+            color: #d9534f;
+            background-color: #ffe6e6;
+            padding: 10px 15px;
+            border-radius: 5px;
+            list-style: none;
         }
         .products-table-container {
-            margin-top: 20px;
             background-color: white;
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-top: 20px;
         }
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .table-actions button, .table-actions input, .table-actions select {
+            padding: 8px 15px;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            transition: all 0.3s;
+        }
+        .table-actions button {
+            background-color: #FF6F61;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .table-actions button:hover {
+            background-color: #e65b50;
+        }
+        .table-actions input {
+            background-color: #fff;
+        }
+        .table-actions input:focus {
+            border-color: #FF6F61;
+            outline: none;
+        }
+        .table-actions select {
+            background-color: #fff;
+        }
+        .refresh-icon {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: #FF6F61;
+        }
+        .refresh-icon:hover {
+            color: #e65b50;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -33,60 +118,59 @@
         table th, table td {
             padding: 12px 15px;
             text-align: left;
+            border-bottom: 1px solid #eee;
         }
         table th {
-            background-color: #f4f4f4;
+            background-color: #FF6F61;
+            color: white;
+            font-weight: 600;
+        }
+        table td {
             color: #333;
         }
-        .table-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .table-actions button, .table-actions input[type="text"], .table-actions select {
-            padding: 5px;
-            font-size: 14px;
-        }
-        .table-actions button {
-            background-color: #28a745;
-            color: white;
-            border: none;
+        table tr:hover {
+            background-color: #fff5f4; 
             cursor: pointer;
         }
-        .table-actions button:hover {
-            background-color: #218838;
-        }
-        .refresh-icon {
-            cursor: pointer;
-            margin-left: 10px;
+        table img {
+            border-radius: 5px;
+            object-fit: cover;
         }
         .product-action {
             display: flex;
             justify-content: flex-end;
+            gap: 10px;
         }
-        .product-action i {
-            cursor: pointer;
-            margin-left: 10px;
-        }
-        .product-action a {
+        .product-action a, .product-action i {
+            color: #FF6F61;
             text-decoration: none;
+            font-size: 1.1em;
+            transition: color 0.3s;
         }
-        .product-action i:hover {
-            color: #ff3333;
+        .product-action a:hover, .product-action i:hover {
+            color: #e65b50;
         }
-        .error {
-            color: red;
-        }
-        .success {
-            color: green;
-        }
-        .table-actions button, .table-actions input[type="text"], .table-actions select {
-            border-radius: 5px;
-            margin: 0 5px;
-            transition: background-color 0.3s;
-        }
-        .products-table-container {
-            border-radius: 10px;
+
+        @media (max-width: 767px) {
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .table-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            table th, table td {
+                font-size: 0.9em;
+                padding: 8px;
+            }
+            .product-action {
+                justify-content: flex-start;
+            }
+            table img {
+                width: 40px;
+                height: 40px;
+            }
         }
     </style>
 </head>
@@ -100,7 +184,7 @@
     <div class="main-content">
         <h1>Products</h1>
         {% if messages %}
-            <ul>
+            <ul class="messages">
                 {% for message in messages %}
                     <li class="{{ message.tags }}">{{ message }}</li>
                 {% endfor %}
@@ -109,13 +193,13 @@
         <div class="products-table-container">
             <div class="table-actions">
                 <button id="add-product-btn">+ Add Product</button>
-                <div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     <input type="text" id="search" placeholder="Search products...">
                     <select id="sort-select">
-                        <option value="name-asc">Sort by Name (A-Z)</option>
-                        <option value="name-desc">Sort by Name (Z-A)</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
                     </select>
-                    <button class="refresh-icon" onclick="refreshPage()">🔄</button>
+                    <button class="refresh-icon" onclick="refreshPage()" title="Refresh"><i class="bi bi-arrow-clockwise"></i></button>
                 </div>
             </div>
             <table id="products-table">
@@ -127,13 +211,13 @@
                         <th>Sale Price</th>
                         <th>Qty</th>
                         <th>Main Image</th>
-                        <th>Image</th>
+                        <th>Images</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for product in products %}
-                    <tr onclick="redirectToProductDetail({{ product.id }})" style="cursor: pointer;">
+                    <tr onclick="redirectToProductDetail({{ product.id }})">
                         <td>{{ forloop.counter }}</td>
                         <td>{{ product.product_name }}</td>
                         <td>{{ product.category.name }}</td>
@@ -143,68 +227,58 @@
                             {% if product.main_image %}
                                 <img src="{{ product.main_image.url }}" alt="Main image for {{ product.product_name }}" width="50" height="50">
                             {% else %}
-                                No Main Image
+                                <span>No Image</span>
                             {% endif %}
                         </td>
                         <td>
                             {% if product.product_images.all %}
-                                {% for image in product.product_images.all %}
-                                   <img src="{{ image.image.url }}" alt="Image for {{ product.product_name }}" width="50" height="50">
+                                {% for image in product.product_images.all|slice:":2" %} <!-- Limit to 2 images -->
+                                    <img src="{{ image.image.url }}" alt="Image for {{ product.product_name }}" width="50" height="50">
                                 {% endfor %}
+                                {% if product.product_images.all|length > 2 %}
+                                    <span>+{{ product.product_images.all|length|add:"-2" }} more</span>
+                                {% endif %}
                             {% else %}
-                                No Additional Images
+                                <span>No Images</span>
                             {% endif %}
                         </td>
                         <td class="product-action">
-                            <a href="{% url 'edit_product' product.id %}">
-                                <i class="edit-icon" data-product-id="{{ product.id }}">✏️</i>
+                            <a href="{% url 'edit_product' product.id %}" title="Edit Product" onclick="event.stopPropagation();">
+                                <i class="bi bi-pencil"></i>
                             </a>
-                            <i class="delete-icon" data-product-id="{{ product.id }}">❌</i>
+                            <i class="bi bi-trash delete-icon" data-product-id="{{ product.id }}" title="Delete Product" onclick="event.stopPropagation();"></i>
                         </td>                        
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8">No products found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            
         </div>
     </div>
-    
+
     <script>
         function redirectToProductDetail(productId) {
-            const url = `/admin/products/${productId}/`; 
-            window.location.href = url;
+            window.location.href = `/admin/products/${productId}/`;
         }
-    </script>
-    
-    
-    <script>
-        const editIcons = document.querySelectorAll('.edit-icon');
-        const deleteIcons = document.querySelectorAll('.delete-icon');
 
-        editIcons.forEach((icon) => {
+        document.querySelectorAll('.delete-icon').forEach(icon => {
             icon.addEventListener('click', function() {
                 const productId = this.dataset.productId;
-                window.location.href = `/edit-product/${productId}/`; 
-            });
-        });
-
-
-        deleteIcons.forEach(icon => {
-            icon.addEventListener('click', function() {
-                const productId = this.dataset.productId; 
-
                 if (confirm('Are you sure you want to delete this product?')) {
                     fetch(`/delete-product/${productId}/`, {
                         method: 'POST',
                         headers: {
-                            'X-CSRFToken': getCookie('csrftoken') 
+                            'X-CSRFToken': getCookie('csrftoken')
                         }
                     })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
                             alert('Product soft-deleted successfully!');
-                            location.reload(); 
+                            location.reload();
                         } else {
                             alert('Error deleting product');
                         }
@@ -213,6 +287,7 @@
                 }
             });
         });
+
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -228,47 +303,34 @@
             return cookieValue;
         }
 
-
-        // Sort products by name
-        document.getElementById('sort-select').addEventListener('change', function() {
-            const option = this.value;
-            const rows = Array.from(document.querySelectorAll('#products-table tbody tr'));
-
-            rows.sort((rowA, rowB) => {
-                const nameA = rowA.cells[1].textContent.trim();
-                const nameB = rowB.cells[1].textContent.trim();
-
-                if (option === 'name-asc') {
-                    return nameA.localeCompare(nameB);
-                } else {
-                    return nameB.localeCompare(nameA);
-                }
-            });
-
-            const tbody = document.querySelector('#products-table tbody');
-            rows.forEach(row => tbody.appendChild(row));
-        });
-
-        // Filter products (example for demonstration)
         document.getElementById('search').addEventListener('input', function() {
             const query = this.value.toLowerCase();
             const rows = document.querySelectorAll('#products-table tbody tr');
-
             rows.forEach(row => {
                 const productName = row.cells[1].textContent.toLowerCase();
                 row.style.display = productName.includes(query) ? '' : 'none';
             });
         });
 
-        // Refresh page function
+        document.getElementById('sort-select').addEventListener('change', function() {
+            const option = this.value;
+            const rows = Array.from(document.querySelectorAll('#products-table tbody tr'));
+            rows.sort((rowA, rowB) => {
+                const nameA = rowA.cells[1].textContent.trim();
+                const nameB = rowB.cells[1].textContent.trim();
+                return option === 'name-asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+            });
+            const tbody = document.querySelector('#products-table tbody');
+            rows.forEach(row => tbody.appendChild(row));
+        });
+
         function refreshPage() {
             location.reload();
         }
-        // Add Product Button
+
         document.getElementById('add-product-btn').addEventListener('click', function() {
             window.location.href = "{% url 'add_product' %}";
         });
-
     </script>
 </body>
 </html>

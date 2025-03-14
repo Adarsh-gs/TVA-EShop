@@ -11,9 +11,17 @@ class UserProfile(models.Model):
     email = models.EmailField()
     is_active = models.BooleanField(default=True)
     
-
     def __str__(self):
         return f"{self.user.username} ({self.user.email})" if self.user else "User Profile"
+    
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True, default='default.jpg')
+    mobile = models.CharField(max_length=15, blank=True, null=True)
+    dob = models.DateField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
     
 class UserOTP(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -57,7 +65,7 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.product_name}"
-    
+
 class Review(models.Model):
     product = models.ForeignKey(Product, related_name="reviews", on_delete=models.CASCADE)
     reviewer_name = models.CharField(max_length=100)
@@ -68,6 +76,10 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.reviewer_name} for {self.product.product_name}"
+
+from django.db import models
+from django.utils import timezone
+from decimal import Decimal, ROUND_HALF_UP
 
 class Coupon(models.Model):
     code = models.CharField(max_length=50, unique=True)  
@@ -82,12 +94,24 @@ class Coupon(models.Model):
     def is_expired(self):
         return self.expiration_date and self.expiration_date < timezone.now().date()
 
-    def apply_discount(self, total_amount):
+    def apply_discount(self, total_price):
         if self.discount_type == 'percent':
-            return total_amount * (1 - self.discount_value / 100)
-        elif self.discount_type == 'flat':
-            return total_amount - self.discount_value
-        return total_amount
+            discount = (self.discount_value / 100) * total_price
+        else: 
+            discount = self.discount_value
+        
+        return min(discount, total_price).quantize(Decimal('0.01'), rounding=ROUND_HALF_UP)
+
+class CouponUsage(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE)
+    used_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'coupon')  
+
+    def __str__(self):
+        return f"{self.user.username} used {self.coupon.code}"
 
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -136,6 +160,7 @@ class OrderItem(models.Model):
     selected_size = models.CharField(max_length=50, blank=True, null=True)
     selected_color = models.CharField(max_length=50, blank=True, null=True)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
+    status = models.CharField(max_length=50, default="Pending")
 
     def __str__(self):
         return f"{self.product.product_name} x {self.quantity} in Order {self.order.id}"
@@ -157,18 +182,32 @@ class Wishlist(models.Model):
     class Meta:
         unique_together = ('user', 'product')  
 
+from django.db import models
+from django.utils import timezone
+
 class Offer(models.Model):
-    offer_code = models.CharField(max_length=100)
-    offer_type = models.CharField(max_length=100)
-    discount_type = models.CharField(max_length=50, default='') 
+    OFFER_TYPES = (
+        ('product', 'Product Offer'),
+        ('category', 'Category Offer'),
+        ('referral', 'Referral Offer'),
+    )
+    DISCOUNT_TYPES = (
+        ('percentage', 'Percentage'),
+        ('amount', 'Fixed Amount'),
+    )
+    
+    offer_type = models.CharField(max_length=100, choices=OFFER_TYPES)
+    discount_type = models.CharField(max_length=50, choices=DISCOUNT_TYPES, default='percentage')
     discount_value = models.DecimalField(max_digits=10, decimal_places=2)
     starting_date = models.DateField(default='2025-01-01')
     expiration_date = models.DateField()
-    is_referral_offer = models.BooleanField(default=False) 
+    is_referral_offer = models.BooleanField(default=False)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, null=True, blank=True)
+    category = models.ForeignKey('Category', on_delete=models.CASCADE, null=True, blank=True)
 
     def __str__(self):
-        return self.offer_code
-
+        return f"{self.get_offer_type_display()} - {self.discount_value}{'%' if self.discount_type == 'percentage' else '₹'}"
+    
 class Referral(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="referral", verbose_name="Referrer")
     code = models.CharField(max_length=10, unique=True, verbose_name="Referral Code")
@@ -181,3 +220,20 @@ class Wallet(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     balance = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+class WalletTransaction(models.Model):
+    TRANSACTION_TYPES = (
+        ('credit', 'Credit'),
+        ('debit', 'Debit'),
+    )
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='wallet_transactions')
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    transaction_type = models.CharField(max_length=6, choices=TRANSACTION_TYPES)
+    description = models.CharField(max_length=255)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f"{self.transaction_type} of ₹{self.amount} for {self.user.username} on {self.created_at}"
+
+    class Meta:
+        ordering = ['-created_at']

@@ -1,4 +1,4 @@
-{% load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,7 +9,7 @@
         <meta content="Shop the latest electronics, fashion, and more at TVA E-Shop. Discover exclusive deals and fast delivery!" name="description">
 
         <!-- Favicon -->
-        <link href="{% static ''%}img/favicon.ico" rel="icon">
+        <link href="{% static '' %}img/favicon.ico" rel="icon">
 
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400|Source+Code+Pro:700,900&display=swap" rel="stylesheet">
@@ -17,11 +17,11 @@
         <!-- CSS Libraries -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
-        <link href="{% static 'lib/slick/slick.css'%}" rel="stylesheet">
-        <link href="{% static 'lib/slick/slick-theme.css'%}" rel="stylesheet">
+        <link href="{% static 'lib/slick/slick.css' %}" rel="stylesheet">
+        <link href="{% static 'lib/slick/slick-theme.css' %}" rel="stylesheet">
 
         <!-- Template Stylesheet -->
-        <link href="{% static 'css/style.css'%}" rel="stylesheet">
+        <link href="{% static 'css/style.css' %}" rel="stylesheet">
         <style>
             .btn-modern {
                 background-color: #007bff;
@@ -41,11 +41,101 @@
                 transform: translateY(-2px);
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             }
+            .custom-popup {
+                position: fixed;
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                background-color: #FF6F61;
+                color: rgb(255, 255, 255);
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                font-weight: bold;
+                z-index: 1000;
+                text-align: center;
+                width: 80%;
+                max-width: 600px;
+                display: none;
+            }
+            .close-btn {
+                position: absolute;
+                top: 5px;
+                right: 10px;
+                font-size: 20px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+            .message-text {
+                margin-right: 20px;
+            }
+            /* Updated Coupon Styles */
+            .coupon-section {
+                margin-top: 20px;
+                padding: 15px;
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            }
+            .coupon-section h3 {
+                color: #333;
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+            }
+            .coupon-section h3 i {
+                margin-right: 10px;
+                color: #FF6F61;
+            }
+            .coupon-card {
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 15px;
+                margin-bottom: 15px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .coupon-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+            .coupon-details {
+                display: flex;
+                align-items: center;
+            }
+            .coupon-details i {
+                color: #FF6F61;
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
+            .coupon-details span {
+                font-size: 1.1rem;
+                color: #333;
+                font-weight: 500;
+            }
+            .coupon-details .discount {
+                color: #e67e22;
+                font-weight: bold;
+                margin-left: 5px;
+            }
+            .remove-coupon-btn {
+                width: 200px;
+            }
+            @media (max-width: 768px) {
+                .coupon-card {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
         </style>
     </head>
 
     <body>
-        {% include 'inc/topbar.html'%} 
+        {% include 'inc/topbar.html' %}
         <!-- Nav Bar Start -->
         <div class="nav">
             <div class="container-fluid">
@@ -54,18 +144,18 @@
                     <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav mr-auto">
-                            <a href="{% url 'Home_page'%}" class="nav-item nav-link">Home</a>
-                            <a href="{% url 'Product_list'%}" class="nav-item nav-link">Products</a>
-                            <a href="{% url 'cart'%}" class="nav-item nav-link active">Cart</a>
-                            <a href="{% url 'Checkout'%}" class="nav-item nav-link">Checkout</a>
-                            <a href="{% url 'My_account'%}" class="nav-item nav-link">My Account</a>
+                            <a href="{% url 'Home_page' %}" class="nav-item nav-link">Home</a>
+                            <a href="{% url 'Product_list' %}" class="nav-item nav-link">Products</a>
+                            <a href="{% url 'cart' %}" class="nav-item nav-link active">Cart</a>
+                            <a href="{% url 'Checkout' %}" class="nav-item nav-link">Checkout</a>
+                            <a href="{% url 'order_list' %}" class="nav-item nav-link">Orders</a>
+                            <a href="{% url 'My_account' %}" class="nav-item nav-link">My Account</a>
                             <div class="nav-item dropdown">
                                 <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">More Pages</a>
                                 <div class="dropdown-menu">
-                                    <a href="{% url 'Wishlist'%}" class="dropdown-item">Wishlist</a>
+                                    <a href="{% url 'Wishlist' %}" class="dropdown-item">Wishlist</a>
                                     <a href="{% url 'contact' %}" class="dropdown-item">Contact Us</a>
                                 </div>
                             </div>
@@ -79,34 +169,37 @@
                 </nav>
             </div>
         </div>
-        <!-- Nav Bar End -->   
-        {% include 'inc/bottombar.html'%} 
-        
+        <!-- Nav Bar End -->
+        {% include 'inc/bottombar.html' %}
+
         <!-- Breadcrumb Start -->
         <div class="breadcrumb-wrap">
             <div class="container-fluid">
                 <ul class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{% url 'Home_page'%}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'Product_list'%}">Products</a></li>
-                    <li class="breadcrumb-item"><a href="{% url 'Product_list'%}">Product Detail</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'Home_page' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'Product_list' %}">Products</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'Product_list' %}">Product Detail</a></li>
                     <li class="breadcrumb-item active">Cart</li>
                 </ul>
             </div>
         </div>
         <!-- Breadcrumb End -->
-        
+
         <!-- Cart Start -->
+        {% if messages %}
+        <div id="custom-popup" class="custom-popup">
+            <span class="close-btn" onclick="closePopup()">×</span>
+            <div class="message-text">
+                {% for message in messages %}
+                    {{ message }}<br>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         <div class="cart-page">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-8">
-                        {% if messages %}
-                            <div class="messages">
-                                {% for message in messages %}
-                                    <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endif %}
                         <div class="cart-page-inner">
                             <div class="table-responsive">
                                 <table class="table table-bordered">
@@ -115,47 +208,55 @@
                                             <th>Product</th>
                                             <th>Size</th>
                                             <th>Colour</th>
-                                            <th>Price</th>
+                                            <th>Original Price</th>
+                                            <th>Offer</th>
                                             <th>Quantity</th>
                                             <th>Total</th>
                                             <th>Remove</th>
                                         </tr>
                                     </thead>
                                     <tbody class="align-middle">
-                                        {% for item in cart_items %}
-                                        <tr>
-                                            <td>
-                                                <div class="img">
-                                                    <a href="#"><img src="{{ item.product.main_image.url }}" alt="Image"></a>
-                                                    <p>{{ item.product.product_name }}</p>
-                                                </div>
-                                            </td>
-                                            <td>{{ item.selected_size }}</td>
-                                            <td>{{ item.selected_color }}</td>
-                                            <td>${{ item.product.sale_price }}</td>
-                                            <td>
-                                                <div class="qty">
-                                                    <form method="POST" action="{% url 'update_cart' item.id %}">
+                                        {% if cart_items %}
+                                            {% for enhanced_item in cart_items %}
+                                            <tr>
+                                                <td>
+                                                    <div class="img">
+                                                        <a href="#"><img src="{{ enhanced_item.item.product.main_image.url }}" alt="Image"></a>
+                                                        <p>{{ enhanced_item.item.product.product_name }}</p>
+                                                    </div>
+                                                </td>
+                                                <td>{{ enhanced_item.item.selected_size }}</td>
+                                                <td>{{ enhanced_item.item.selected_color }}</td>
+                                                <td>₹{{ enhanced_item.original_price }}</td>
+                                                <td>{{ enhanced_item.offer_display }}</td>
+                                                <td>
+                                                    <div class="qty">
+                                                        <form method="POST" action="{% url 'update_cart' enhanced_item.item.id %}">
+                                                            {% csrf_token %}
+                                                            <div class="qty">
+                                                                <button type="submit" name="action" value="decrease" class="btn-minus" {% if enhanced_item.item.quantity <= 1 %}disabled{% endif %}>-</button>
+                                                                <input type="number" name="quantity" value="{{ enhanced_item.item.quantity }}" id="quantity-input" min="1" readonly>
+                                                                <button type="submit" name="action" value="increase" class="btn-plus">+</button>
+                                                            </div>
+                                                        </form>
+                                                    </div>
+                                                </td>
+                                                <td>₹{{ enhanced_item.total_price }}</td>
+                                                <td>
+                                                    <form method="POST" action="{% url 'remove_from_cart' enhanced_item.item.id %}">
                                                         {% csrf_token %}
-                                                        <div class="qty">
-                                                            <button type="submit" name="action" value="decrease" class="btn-minus" {% if item.quantity <= 1 %}disabled{% endif %}>-</button>
-                                                            <input type="number" name="quantity" value="{{ item.quantity }}" id="quantity-input" min="1" readonly>
-                                                            <button type="submit" name="action" value="increase" class="btn-plus">+</button>
-                                                        </div>
+                                                        <button type="submit"><i class="fa fa-trash"></i></button>
                                                     </form>
-                                                </div>
-                                            </td>
-                                            <td>${{ item.total_price }}</td>
-                                            <td>
-                                                <form method="POST" action="{% url 'remove_from_cart' item.id %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit"><i class="fa fa-trash"></i></button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="9" class="empty-cart-message">You have no products in your cart.</td>
+                                            </tr>
+                                        {% endif %}
                                     </tbody>
-                                </table>                                
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -165,17 +266,55 @@
                                 <div class="col-md-12">
                                     <div class="coupon">
                                         {% if coupon %}
-                                        <form method="POST" action="{% url 'cart' %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="remove_coupon" value="true">
-                                            <button type="submit">Remove Code</button>
-                                        </form>
+                                            {% if not coupon_used %}
+                                                <form method="POST" action="{% url 'cart' %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="remove_coupon" value="true">
+                                                    <button type="submit" class="btn btn-danger remove-coupon-btn" style="width: 200px;">Remove Coupon</button>
+                                                </form>
+                                            {% else %}
+                                                <form method="POST" action="{% url 'cart' %}">
+                                                    {% csrf_token %}
+                                                    <div class="input-group mb-3">
+                                                        <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code">
+                                                        <div class="input-group-append">
+                                                            <button type="submit" class="btn btn-primary">Apply Code</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            {% endif %}
                                         {% else %}
-                                        <form method="POST" action="{% url 'cart' %}">
-                                            {% csrf_token %}
-                                            <input type="text" name="coupon_code" placeholder="Coupon Code">
-                                            <button type="submit">Apply Code</button>
-                                        </form>
+                                            <form method="POST" action="{% url 'cart' %}">
+                                                {% csrf_token %}
+                                                <div class="input-group mb-3">
+                                                    <input type="text" name="coupon_code" class="form-control" placeholder="Enter Coupon Code">
+                                                    <div class="input-group-append">
+                                                        <button type="submit" class="btn btn-primary">Apply Code</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        {% endif %}
+                                        {% if available_coupons %}
+                                        <div class="coupon-section">
+                                            <h3><i class="fas fa-ticket-alt"></i> Available Coupons</h3>
+                                            {% for coupon in available_coupons %}
+                                            <div class="coupon-card">
+                                                <div class="coupon-details">
+                                                    <i class="fas fa-tag"></i>
+                                                    <span>{{ coupon.code }}</span>
+                                                    <span class="discount">
+                                                        {% if coupon.discount_type == 'percent' %}
+                                                            -{{ coupon.discount_value }}% Off
+                                                        {% else %}
+                                                            -₹{{ coupon.discount_value }} Off
+                                                        {% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <p class="text-muted mt-3">No available coupons at this time.</p>
                                         {% endif %}
                                     </div>
                                 </div>
@@ -183,44 +322,41 @@
                                     <div class="cart-summary">
                                         <div class="cart-content">
                                             <h1>Cart Summary</h1>
-                                            <p>Sub Total<span>${{ total_price }}</span></p>
-                                            <p>Shipping Cost<span>${{ shipping_cost }}</span></p>
-                            
+                                            <p>Sub Total<span>₹{{ total_price }}</span></p>
+                                            <p>Shipping Cost<span>₹{{ shipping_cost }}</span></p>
                                             {% if discount > 0 %}
-                                                <p>Discount Applied: <span>-${{ discount }}</span></p>
+                                                <p>Discount Applied: <span>-₹{{ discount }}</span></p>
                                             {% endif %}
-                            
-                                            <h2>Grand Total<span>${{ grand_total }}</span></h2>
+                                            <h2>Grand Total<span>₹{{ grand_total }}</span></h2>
                                         </div>
                                         <div class="cart-btn mt-3">
-                                            <a href="{% url 'Checkout' %}" 
-                                               class="btn btn-modern px-4 py-2 d-flex align-items-center justify-content-center">
+                                            <a href="{% url 'Checkout' %}" class="btn btn-modern px-4 py-2 d-flex align-items-center justify-content-center">
                                                 <i class="fa fa-shopping-cart me-2"></i> Checkout
                                             </a>
                                         </div>
                                     </div>
                                 </div>
-                            </div>                            
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         <!-- Cart End -->
-        
-        {% include 'inc/footer.html'%}          
-        
+
+        {% include 'inc/footer.html' %}
+
         <!-- Back to Top -->
         <a href="#" class="back-to-top"><i class="fa fa-chevron-up"></i></a>
-        
+
         <!-- JavaScript Libraries -->
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
-        <script src="{% static 'lib/easing/easing.min.js'%}"></script>
-        <script src="{% static 'lib/slick/slick.min.js'%}"></script>
-        
+        <script src="{% static 'lib/easing/easing.min.js' %}"></script>
+        <script src="{% static 'lib/slick/slick.min.js' %}"></script>
+
         <!-- Template Javascript -->
-        <script src="{% static 'js/main.js'%}"></script>
+        <script src="{% static 'js/main.js' %}"></script>
         <script>
             function getCookie(name) {
                 let cookieValue = null;
@@ -247,6 +383,23 @@
                 body: JSON.stringify({ action: 'increase' }),
             });
         </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                var popup = document.getElementById("custom-popup");
+                if (popup) {
+                    popup.style.display = "block";
+                    setTimeout(function () {
+                        closePopup();
+                    }, 5000);
+                }
+            });
         
+            function closePopup() {
+                var popup = document.getElementById("custom-popup");
+                if (popup) {
+                    popup.style.display = "none";
+                }
+            }
+        </script>
     </body>
 </html>
